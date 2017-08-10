@@ -1,0 +1,6 @@
+1. The first number represents the ID of the enemy unit to be spawned. Note that the first enemy unit has an ID of 0.
+2. The second number represents the amount of times the enemy unit is spawned. -1 is used to indicate that the spawns of that enemy are unlimited.
+3. The third number represents the frame that the enemy unit is first spawned. Animation Timers run at 60 frames per second, so divide by 60 to convert to seconds.
+4. The fourth and fifth numbers represent the time before each consecutive enemy unit when multiple are spawned as shown by the second number. Since most spawns 
+   are timed in a random interval within two bounds, two numbers are used to represent this. When this random aspect is not present, the two numbers are equal.
+5. Leave one space at the end of every line and leave one empty line at the end of the text file.
