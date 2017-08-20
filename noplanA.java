@@ -17,14 +17,15 @@ import java.util.*;
 //Importing my stuff
 
 class FieldCats {
-	int ID, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, framedata, range, damageframedata, knockbackframedata, price;
+	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, framedata, range, damageframedata, knockbackframedata, price;
 	double speed, xpos, ypos;
 	boolean area, massivedamage, resistance, doublecash, idle, immunity, knockbackimmunity, alive;
 	
-	FieldCats(int ID, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int framedata, int range,
-			  int damageframedata, int knockbackframedata, double speed, double xpos, double ypos, int price, boolean area, boolean massivedamage,
+	FieldCats(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int framedata,
+			  int range, int damageframedata, int knockbackframedata, double speed, double xpos, double ypos, int price, boolean area, boolean massivedamage,
 			  boolean resistance, boolean doublecash, boolean idle, boolean immunity, boolean knockbackimmunity, boolean alive) {
 		this.ID = ID;
+		this.baseline = baseline;
 		this.maxhealth = maxhealth;
 		this.health = health;
 		this.knockbacks = knockbacks;
@@ -53,14 +54,16 @@ class FieldCats {
 }
 
 class FieldEnemies {
-	int ID, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, framedata, range, aggrorange, minrange, damageframedata, cannonframedata, pricedrop, knockbackchance;
+	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, framedata, range, aggrorange, minrange, damageframedata,
+	    cannonframedata, pricedrop, knockbackchance;
 	double speed, xpos, ypos;
 	boolean area, idle, immunity, cannonimmunity, alive;
 	
-	FieldEnemies(int ID, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int framedata, int range,
-				 int aggrorange, int minrange, int damageframedata, int cannonframedata, double speed, double xpos, double ypos, int pricedrop, int knockbackchance,
-				 boolean area, boolean idle, boolean immunity, boolean cannonimmunity, boolean alive) {
+	FieldEnemies(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int framedata,
+				 int range, int aggrorange, int minrange, int damageframedata, int cannonframedata, double speed, double xpos, double ypos, int pricedrop,
+				 int knockbackchance, boolean area, boolean idle, boolean immunity, boolean cannonimmunity, boolean alive) {
 		this.ID = ID;
+		this.baseline = baseline;
 		this.maxhealth = maxhealth;
 		this.health = health;
 		this.knockbacks = knockbacks;
@@ -123,7 +126,8 @@ public class noplanA extends Application {
  
 	int i, j, k, catdeployed, deleteunit, unitID, unitanimation, unitbackswing, unitframedata, money, success;
 	int truewavexpos = -40;
-	int numofcats, numofenemies, lowestunit, cannonrecharge, linenumber = 0;
+	int numofcats, numofenemies, cannonrecharge, linenumber = 0;
+	int lowestunit = -1;
 	double unitxpos, unitypos, lowestxpos = 0;
 	int maxmoney = 6000;
 	int workercat = 1;
@@ -141,6 +145,9 @@ public class noplanA extends Application {
 	
 	ImageView slotarray[] = new ImageView[50];
 	Image catpictures[] = new Image[11];
+	Image catpicturesanimation[] = new Image[11];
+	Image catpicturesattack[] = new Image[11];
+	Image catpicturesbackswing[] = new Image[11];
 	ImageView limitarray[] = new ImageView[12];
 	Image enemypictures[] = new Image[4];
 	Image enemypicturesanimation[] = new Image[4];
@@ -262,7 +269,7 @@ public class noplanA extends Application {
 		Scene scene = new Scene(root, 800, 380);
 		
 		for (i = 0; i < 50; i++) {
-			catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+			catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
 			
 			slotarray[i] = new ImageView();
 			slotarray[i].setVisible(false);
@@ -270,7 +277,7 @@ public class noplanA extends Application {
 		}
 		
 		for (i = 0; i < 12; i++) {
-			enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
+			enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
 			
 			limitarray[i] = new ImageView();
 			limitarray[i].setVisible(false);
@@ -279,6 +286,9 @@ public class noplanA extends Application {
 		
 		for (i = 1; i < 2; i++) {
 			catpictures[i - 1] = new Image("Unit_ID_" + i + ".png");
+			catpicturesanimation[i - 1] = new Image("Unit_ID_" + i + "_Animation.png");
+			catpicturesattack[i - 1] = new Image("Unit_ID_" + i + "_Attack.png");
+			catpicturesbackswing[i - 1] = new Image("Unit_ID_" + i + "_Backswing.png");
 		}
 		
 		for (i = 0; i < 10; i++) {
@@ -541,7 +551,7 @@ public class noplanA extends Application {
 								slotdisplay[catdeployed - 1].setImage(slotpicturesidle[catdeployed - 1]);
 								rechargerects[catdeployed - 1].setVisible(true);
 							} else {
-								catarray[numofcats] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+								catarray[numofcats] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
 							}
 							
 						}
@@ -554,7 +564,7 @@ public class noplanA extends Application {
 			
 		});
 		
-		enemyarray[0] = new FieldEnemies(1, 2400000, 2400000, 4, 0, 120, 32000, 120, 0, 480, 325, 275, 0, 0, 0.2667, 50, 0, 19750, 0, true, true, false, false, true);
+		enemyarray[0] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 32000, 120, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true);
 		numofenemies++;
 		
 		AnimationTimer timer = new AnimationTimer() {
@@ -611,6 +621,7 @@ public class noplanA extends Application {
 							catarray[i].alive = false;
 						}
 						
+						//damage knockback animation
 						if (catarray[i].immunity) {
 							catarray[i].damageframedata++;
 							
@@ -637,6 +648,7 @@ public class noplanA extends Application {
 							
 						}
 						
+						//proc knockback animation
 						if (catarray[i].knockbackimmunity) {
 							catarray[i].knockbackframedata++;
 							
@@ -648,7 +660,6 @@ public class noplanA extends Application {
 								tempround2 = 6750;
 								
 								catarray[i].xpos = catarray[i].xpos - (tempround1 / tempround2) + catarray[i].speed;
-								System.out.println(catarray[i].xpos);
 							}
 							
 						}
@@ -657,7 +668,7 @@ public class noplanA extends Application {
 							allowmove = true;
 							
 							for (j = 0; j < numofenemies && allowmove; j++) {
-								allowmove = StopMoving(catarray[i].xpos, catarray[i].range, enemyarray[j].xpos, allowmove);
+								allowmove = StopMoving(catarray[i].xpos, catarray[i].baseline, catarray[i].range, enemyarray[j].xpos, enemyarray[j].baseline);
 							}
 							
 							if (allowmove) {
@@ -673,11 +684,20 @@ public class noplanA extends Application {
 								
 								for (j = 0; j < numofenemies; j++) {
 									
-									if (catarray[i].xpos - catarray[i].range < enemyarray[j].xpos && !enemyarray[j].immunity && !enemyarray[j].cannonimmunity) {
+									if (catarray[i].xpos + catarray[i].baseline - catarray[i].range < enemyarray[j].xpos + enemyarray[j].baseline &&
+										!(enemyarray[j].immunity || !enemyarray[j].cannonimmunity)) {
 										
 										if (catarray[i].area) {	
 											enemyarray[j].health -= catarray[i].damage;
-										} else if (enemyarray[j].xpos > enemyarray[lowestunit].xpos) {
+										} else if (lowestunit == -1) {
+											lowestunit = j;
+											
+											if (j == numofenemies - 1) {
+												enemyarray[lowestunit].health -= catarray[i].damage;
+												System.out.println("-----------------------------------------");
+											}
+											
+										} else if (enemyarray[j].xpos + enemyarray[j].baseline > enemyarray[lowestunit].xpos + enemyarray[lowestunit].baseline) {
 											lowestunit = j;
 											
 											if (j == numofenemies - 1) {
@@ -699,7 +719,8 @@ public class noplanA extends Application {
 									}
 									
 								}
-							
+								
+								lowestunit = -1;
 							} else if (catarray[i].framedata == catarray[i].animation + catarray[i].backswing) {
 								catarray[i].framedata = 0;
 								catarray[i].idle = true;
@@ -714,11 +735,13 @@ public class noplanA extends Application {
 					}
 					
 					for (i = 0; i < numofenemies; i++) {
+						System.out.println(enemyarray[i].health);
 						
 						if (enemyarray[i].health < 0) {
 							enemyarray[i].alive = false;
 						}
 						
+						//damage knockback animation
 						if (enemyarray[i].immunity) {
 							enemyarray[i].damageframedata++;
 							
@@ -748,6 +771,7 @@ public class noplanA extends Application {
 							
 						}
 						
+						//cannon knockback animation
 						if (activecannon && ((enemyarray[i].xpos > 1200 - (wavexpos * 50) && enemyarray[i].xpos < 1300 - (wavexpos * 50)) ||
 							enemyarray[i].cannonimmunity) && (!enemyarray[i].cannonimmunity || enemyarray[i].cannonframedata != 0) && !enemyarray[i].immunity) {
 							
@@ -782,7 +806,7 @@ public class noplanA extends Application {
 							
 						}
 						
-						if (enemyarray[i].xpos + enemyarray[i].minrange >= 1375 && enemyarray[i].idle) {
+						if (enemyarray[i].xpos + enemyarray[i].baseline + enemyarray[i].minrange >= 1375 && enemyarray[i].idle) {
 							enemyarray[i].idle = false;
 						}
 						
@@ -791,7 +815,8 @@ public class noplanA extends Application {
 							
 							for (j = 0; j < numofcats && allowmove; j++) {
 								
-								if (enemyarray[i].xpos + enemyarray[i].aggrorange > catarray[j].xpos && enemyarray[i].xpos < catarray[j].xpos && allowmove) {
+								if (enemyarray[i].xpos + enemyarray[i].baseline + enemyarray[i].aggrorange > catarray[j].xpos + catarray[j].baseline &&
+									enemyarray[i].xpos + enemyarray[i].baseline < catarray[j].xpos + catarray[j].baseline && allowmove) {
 									allowmove = false;
 								}
 								
@@ -810,10 +835,12 @@ public class noplanA extends Application {
 								
 								for (j = 0; j < numofcats; j++) {
 									
-									if (enemyarray[i].xpos + enemyarray[i].range > catarray[j].xpos && enemyarray[i].xpos + enemyarray[i].minrange < catarray[j].xpos && !catarray[j].immunity) {
+									if (enemyarray[i].xpos + enemyarray[i].baseline + enemyarray[i].range > catarray[j].xpos + catarray[j].baseline &&
+										enemyarray[i].xpos + enemyarray[i].baseline + enemyarray[i].minrange < catarray[j].xpos + catarray[j].baseline &&
+										!(catarray[j].immunity || catarray[j].knockbackimmunity)) {
 										catarray[j].health -= enemyarray[i].damage;
 										
-										if (random.nextInt(100) < enemyarray[i].knockbackchance) {
+										if (enemyarray[i].knockbackchance > 0 && random.nextInt(100) < enemyarray[i].knockbackchance) {
 											catarray[j].knockbackimmunity = true;
 										}
 										
@@ -830,7 +857,7 @@ public class noplanA extends Application {
 									
 								}
 								
-								if (enemyarray[i].xpos + enemyarray[i].range >= 1375) {
+								if (enemyarray[i].xpos + enemyarray[i].baseline + enemyarray[i].range >= 1375) {
 									catbasehealth -= enemyarray[i].damage;
 								}
 								
@@ -848,7 +875,11 @@ public class noplanA extends Application {
 					
 					for (i = 0; i < 50; i++) {
 						unitID = catarray[i].ID;
-						slotarray = RenderCats(unitID, slotarray, i, catpictures);
+						unitanimation = catarray[i].animation;
+						unitbackswing = catarray[i].backswing;
+						unitframedata = catarray[i].framedata;
+						slotarray = RenderCats(unitID, unitanimation, unitbackswing, unitframedata, slotarray, i, catpictures, catpicturesanimation, 
+											   catpicturesattack, catpicturesbackswing);
 					}
 					
 					for (i = 0; i < numofcats; i++) {
@@ -1046,13 +1077,13 @@ public class noplanA extends Application {
 	public static FieldEnemies[] addEnemy(FieldEnemies[] enemyarray1, int numofenemies1, int spawninstructionsID1) {
 		
 		switch (spawninstructionsID1) {
-			case 0: enemyarray1[numofenemies1] = new FieldEnemies(1, 2400000, 2400000, 4, 0, 120, 32000, 120, 0, 480, 325, 275, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true);
+			case 0: enemyarray1[numofenemies1] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 32000, 120, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true);
 			break;
-			case 1: enemyarray1[numofenemies1] = new FieldEnemies(2, 363000, 363000, 2, 0, 15, 2247, 15, 0, 186, 186, 0, 0, 0, 0.3333, 150, 0, 3575, 15, true, true, false, false, true);
+			case 1: enemyarray1[numofenemies1] = new FieldEnemies(2, 0, 363000, 363000, 2, 0, 15, 2247, 15, 0, 186, 186, 0, 0, 0, 0.3333, 150, 0, 3575, 15, true, true, false, false, true);
 			break;
-			case 2: enemyarray1[numofenemies1] = new FieldEnemies(3, 196000, 196000, 6, 0, 10, 11134, 10, 0, 83, 83, 0, 0, 0, 2.1333, 150, 0, 1975, 0, true, true, false, false, true);
+			case 2: enemyarray1[numofenemies1] = new FieldEnemies(3, 0, 196000, 196000, 6, 0, 10, 11134, 10, 0, 83, 83, 0, 0, 0, 2.1333, 150, 0, 1975, 0, true, true, false, false, true);
 			break;
-			case 3: enemyarray1[numofenemies1] = new FieldEnemies(4, 500, 500, 1, 0, 15, 200, 5, 0, 110, 110, 0, 0, 0, 1.3333, 150, 0, 296, 15, true, true, false, false, true);
+			case 3: enemyarray1[numofenemies1] = new FieldEnemies(4, 0, 500, 500, 1, 0, 15, 200, 5, 0, 110, 110, 0, 0, 0, 1.3333, 150, 0, 296, 15, true, true, false, false, true);
 			break;
 		}
 		
@@ -1079,30 +1110,30 @@ public class noplanA extends Application {
 		if (firstrow1) {
 		
 			switch (catdeployed1) {
-				case 1: catarray1[numofcats1] = new FieldCats(1, 6290, 6290, 3, 0, 15, 925, 30, 0, 125, 0, 0, 0.6667, 1375, 0, 510, false, false, false, false, true, false, false, true);
+				case 1: catarray1[numofcats1] = new FieldCats(1, 60, 6290, 6290, 3, 0, 25, 925, 25, 0, 60, 0, 0, 0.6667, 1375, 0, 510, false, false, false, false, true, false, false, true);
 				break;
-				case 2: catarray1[numofcats1] = new FieldCats(2, 11900, 11900, 3, 0, 0, 3400, 0, 0, 150, 0, 0, 0.5333, 1375, 0, 1125, true, false, false, false, true, false, false, true);
+				case 2: catarray1[numofcats1] = new FieldCats(2, 0, 11900, 11900, 3, 0, 0, 3400, 0, 0, 150, 0, 0, 0.5333, 1375, 0, 1125, true, false, false, false, true, false, false, true);
 				break;
-				case 3: catarray1[numofcats1] = new FieldCats(3, 8500, 8500, 5, 0, 0, 595, 0, 0, 140, 0, 0, 3.1333, 1375, 0, 825, true, false, false, false, true, false, false, true);
+				case 3: catarray1[numofcats1] = new FieldCats(3, 0, 8500, 8500, 5, 0, 0, 595, 0, 0, 140, 0, 0, 3.1333, 1375, 0, 825, true, false, false, false, true, false, false, true);
 				break;
-				case 4: catarray1[numofcats1] = new FieldCats(4, 15300, 15300, 2, 0, 0, 2176, 0, 0, 160, 0, 0, 0.5333, 1375, 0, 630, true, false, false, false, true, false, false, true);
+				case 4: catarray1[numofcats1] = new FieldCats(4, 0, 15300, 15300, 2, 0, 0, 2176, 0, 0, 160, 0, 0, 0.5333, 1375, 0, 630, true, false, false, false, true, false, false, true);
 				break;
-				case 5: catarray1[numofcats1] = new FieldCats(5, 17850, 17850, 1, 0, 0, 1020, 0, 0, 120, 0, 0, 0.5333, 1375, 0, 315, false, false, true, false, true, false, false, true);
+				case 5: catarray1[numofcats1] = new FieldCats(5, 0, 17850, 17850, 1, 0, 0, 1020, 0, 0, 120, 0, 0, 0.5333, 1375, 0, 315, false, false, true, false, true, false, false, true);
 				break;
 			}
 			
 		} else {
 			
 			switch (catdeployed1) {
-				case 1: catarray1[numofcats1] = new FieldCats(6, 9435, 9435, 4, 0, 0, 3400, 0, 0, 200, 0, 0, 1.4, 1375, 0, 525, false, true, false, false, true, false, false, true);
+				case 1: catarray1[numofcats1] = new FieldCats(6, 0, 9435, 9435, 4, 0, 0, 3400, 0, 0, 200, 0, 0, 1.4, 1375, 0, 525, false, true, false, false, true, false, false, true);
 				break;
-				case 2: catarray1[numofcats1] = new FieldCats(7, 15300, 15300, 1, 0, 0, 25500, 0, 0, 140, 0, 0, 5, 1375, 0, 750, false, false, false, true, true, false, false, true);
+				case 2: catarray1[numofcats1] = new FieldCats(7, 0, 15300, 15300, 1, 0, 0, 25500, 0, 0, 140, 0, 0, 5, 1375, 0, 750, false, false, false, true, true, false, false, true);
 				break;
-				case 3: catarray1[numofcats1] = new FieldCats(8, 26100, 26100, 5, 0, 0, 682, 0, 0, 140, 0, 0, 4.4, 1375, 0, 750, true, false, false, false, true, false, false, true);
+				case 3: catarray1[numofcats1] = new FieldCats(8, 0, 26100, 26100, 5, 0, 0, 682, 0, 0, 140, 0, 0, 4.4, 1375, 0, 750, true, false, false, false, true, false, false, true);
 				break;
-				case 4: catarray1[numofcats1] = new FieldCats(9, 15660, 15660, 4, 0, 0, 10497, 0, 0, 220, 0, 0, 0.6667, 1375, 0, 975, true, false, false, false, true, false, false, true);
+				case 4: catarray1[numofcats1] = new FieldCats(9, 0, 15660, 15660, 4, 0, 0, 10497, 0, 0, 220, 0, 0, 0.6667, 1375, 0, 975, true, false, false, false, true, false, false, true);
 				break;
-				case 5: catarray1[numofcats1] = new FieldCats(10, 25500, 25500, 6, 0, 0, 85000, 0, 0, 200, 0, 0, 4, 1375, 0, 4500, true, false, false, false, true, false, false, true);
+				case 5: catarray1[numofcats1] = new FieldCats(10, 0, 25500, 25500, 6, 0, 0, 85000, 0, 0, 200, 0, 0, 4, 1375, 0, 4500, true, false, false, false, true, false, false, true);
 				break;
 			}
 			
@@ -1117,7 +1148,7 @@ public class noplanA extends Application {
 			catarray1[j1] = catarray1[j1 + 1];
 		}
 		
-		catarray1[numofcats1 - 1] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+		catarray1[numofcats1 - 1] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
 		return catarray1;
 	}
 	
@@ -1127,23 +1158,35 @@ public class noplanA extends Application {
 			enemyarray1[j1] = enemyarray1[j1 + 1];
 		}
 		
-		enemyarray1[numofenemies1 - 1] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
+		enemyarray1[numofenemies1 - 1] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
 		return enemyarray1;
 	}
 	
-	public static boolean StopMoving(double selfxpos, double selfrange, double otherxpos, boolean allowmove1) {
+	public static boolean StopMoving(double selfxpos, double selfbaseline, double selfrange, double otherxpos, double otherbaseline) {
+		boolean allowmove1 = true;
 		
-		if (selfxpos - selfrange < otherxpos && allowmove1) {
+		if (selfxpos + selfbaseline - selfrange < otherxpos + otherbaseline && allowmove1) {
 			allowmove1 = false;
 		}
 		
 		return allowmove1;
 	}
 	
-	public static ImageView[] RenderCats(int unitID1, ImageView[] slotarray1, int i1, Image[] catpictures1) {
+	public static ImageView[] RenderCats(int unitID1, int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] slotarray1, int i1,
+										 Image[] catpictures1, Image[] catpicturesanimation1, Image[] catpicturesattack1, Image[] catpicturesbackswing1) {
 		
 		if (unitID1 != 0) {
-			slotarray1[i1].setImage(catpictures1[unitID1 - 1]);
+			
+			if (unitframedata1 > unitanimation1 + 15) {
+				slotarray1[i1].setImage(catpicturesbackswing1[unitID1 - 1]);
+			} else if (unitframedata1 >= unitanimation1) {
+				slotarray1[i1].setImage(catpicturesattack1[unitID1 - 1]);
+			} else if (unitframedata1 != 0) {
+				slotarray1[i1].setImage(catpicturesanimation1[unitID1 - 1]);
+			} else {
+				slotarray1[i1].setImage(catpictures1[unitID1 - 1]);
+			}
+			
 			slotarray1[i1].setVisible(true);
 		} else {
 			slotarray1[i1].setVisible(false);
