@@ -57,14 +57,11 @@ class FieldCats {
 }
 
 class FieldEnemies {
-	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, cooldown, framedata, cooldownframedata, range, aggrorange,
-		minrange, damageframedata, cannonframedata, pricedrop, knockbackchance;
+	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, cooldown, framedata, cooldownframedata, range, aggrorange, minrange, damageframedata, cannonframedata, pricedrop, knockbackchance;
 	double speed, xpos, ypos;
 	boolean area, idle, immunity, cannonimmunity, alive;
 	
-	FieldEnemies(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int cooldown,
-				 int framedata, int cooldownframedata, int range, int aggrorange, int minrange, int damageframedata, int cannonframedata, double speed,
-				 double xpos, double ypos, int pricedrop, int knockbackchance, boolean area, boolean idle, boolean immunity, boolean cannonimmunity, boolean alive) {
+	FieldEnemies(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int cooldown, int framedata, int cooldownframedata, int range, int aggrorange, int minrange, int damageframedata, int cannonframedata, double speed, double xpos, double ypos, int pricedrop, int knockbackchance, boolean area, boolean idle, boolean immunity, boolean cannonimmunity, boolean alive) {
 		this.ID = ID;
 		this.baseline = baseline;
 		this.maxhealth = maxhealth;
@@ -131,7 +128,7 @@ public class noplanA extends Application {
  
 	int i, j, k, catdeployed, deleteunit, unitID, unitanimation, unitbackswing, unitframedata, money, success;
 	int truewavexpos = -40;
-	int numofcats, numofenemies, cannonrecharge, linenumber = 0;
+	int numofcats, numofenemies, tempnumofenemies, cannonrecharge, linenumber = 0;
 	int lowestunit = -1;
 	double unitxpos, unitypos, lowestxpos = 0;
 	int maxmoney = 6000;
@@ -139,9 +136,9 @@ public class noplanA extends Application {
 	int catbasehealth = 120000;
 	int enemybasehealth = 750000;
 	double truemoney, wavexpos, tempround1, tempround2, tempround3, tempround4 = 0;
-	long globaltimer = 0;
+	long globaltimer, delaytimer = 0;
 	boolean inthelevel, leftkey, rightkey, allowmove, firstrow, canaffordupgrade, activecannon;
-	boolean godmode, winner, loser = false;
+	boolean godmode, winner, loser, paused, stagecomplete, getcatway = false;
 	
 	FieldCats catarray[] = new FieldCats[50];
 	FieldEnemies enemyarray[] = new FieldEnemies[12];
@@ -158,7 +155,7 @@ public class noplanA extends Application {
 	Image enemypicturesanimation[] = new Image[4];
 	Image enemypicturesattack[] = new Image[4];
 	Image enemypicturesbackswing[] = new Image[4];
-	Text textinstruct[] = new Text[6];
+	Text textinstruct[] = new Text[5];
 	Image slotpictures[] = new Image[11];
 	Image slotpicturesidle[] = new Image[11];
 	ImageView slotdisplay[] = new ImageView[10];
@@ -173,6 +170,7 @@ public class noplanA extends Application {
 	ImageView workercaticon = new ImageView();
 	ImageView cannonicon = new ImageView();
 	ImageView catcannonwave = new ImageView();
+	ImageView pausemenu = new ImageView();
 	Line cannonlaser = new Line();
 	
 	Text moneydisplay = new Text();
@@ -181,6 +179,7 @@ public class noplanA extends Application {
 	Text catbasehealthdisplay = new Text();
 	Text enemybasehealthdisplay = new Text();
 	Text bosspercentage = new Text();
+	Text victorytext = new Text();
 	
 	Color idle = Color.rgb(195, 195, 195);
 	Color active = Color.rgb(255, 242, 0);
@@ -202,6 +201,7 @@ public class noplanA extends Application {
 		Image workercatactive = new Image("Worker_Cat_Active.png");
 		Image wave = new Image("Cat_Cannon_Wave.png");
 		Image defeatscreen = new Image("Defeat_Screen.png");
+		Image pause = new Image("Pause_Menu.png");
 		
 		startbackground.setImage(logo);
 		
@@ -277,8 +277,19 @@ public class noplanA extends Application {
 		bosspercentage.setFill(Color.rgb(255, 255, 255));
 		bosspercentage.setVisible(false);
 		
-		Group root = new Group(startbackground, selectstart, selecthelp, toMenu, backgroundpicture, moneydisplay, workercaticon, workercatlevel, workercatcost,
-							   cannonicon, catcannonwave, cannonlaser, catbasehealthdisplay, enemybasehealthdisplay, bosspercentage);
+		pausemenu.setImage(pause);
+		pausemenu.setLayoutX(225);
+		pausemenu.setLayoutY(40);
+		pausemenu.setVisible(false);
+		
+		victorytext.setText("Victory!!!");
+		victorytext.setLayoutX(290);
+		victorytext.setLayoutY(120);
+		victorytext.setFont(Font.font("Verdana", FontWeight.BOLD, 50));
+		victorytext.setFill(Color.WHITE);
+		victorytext.setVisible(false);
+		
+		Group root = new Group(startbackground, selectstart, selecthelp, toMenu, backgroundpicture, moneydisplay, workercaticon, workercatlevel, workercatcost, cannonicon, catcannonwave, cannonlaser, catbasehealthdisplay, enemybasehealthdisplay, bosspercentage, pausemenu, victorytext);
 		Scene scene = new Scene(root, 800, 380);
 		
 	//Filling arrays used in application
@@ -457,8 +468,7 @@ public class noplanA extends Application {
 					slotdisplay[5].setImage(slotpictures[5]);
 				}
 				
-				setupLevel(startbackground, selectstart, selecthelp, backgroundpicture, moneydisplay, workercaticon, workercatlevel, workercatcost, cannonicon,
-						   slotdisplay, catbasehealthdisplay, enemybasehealthdisplay);
+				setupLevel(startbackground, selectstart, selecthelp, backgroundpicture, moneydisplay, workercaticon, workercatlevel, workercatcost, cannonicon, slotdisplay, catbasehealthdisplay, enemybasehealthdisplay);
 				inthelevel = true;
 				firstrow = true;
 				canaffordupgrade = false;
@@ -474,6 +484,8 @@ public class noplanA extends Application {
 			public void handle(MouseEvent event) {
 				
 				if (loser) {
+					backgroundpicture.setImage(background);
+					backgroundpicture.relocate(-800, -380);
 					backgroundpicture.setVisible(false);
 					moneydisplay.setVisible(false);
 					workercaticon.setVisible(false);
@@ -486,15 +498,17 @@ public class noplanA extends Application {
 					
 					for (i = 0; i < 10; i++) {
 						slotdisplay[i].setVisible(false);
+						rechargerects[i].setVisible(false);
+						rechargearray[i].lastdeployed = 0;
 					}
 					
-					for (i = 0; i < numofcats; i++) {
-						catarray = removeCat(catarray, numofcats, i);
+					for (i = 0; i < 50; i++) {
+						catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
 						slotarray[i].setVisible(false);
 					}
 					
-					for (i = 0; i < numofenemies; i++) {
-						enemyarray = removeEnemy(enemyarray, numofenemies, i);
+					for (i = 0; i < 12; i++) {
+						enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
 						limitarray[i].setVisible(false);
 					}
 					
@@ -504,8 +518,15 @@ public class noplanA extends Application {
 					
 					inthelevel = false;
 					loser = false;
+					
+					numofcats = 0;
+					numofenemies = 0;
+					catbasehealth = 120000;
+					enemybasehealth = 750000;
+					globaltimer = 0;
 				}
 				
+				event.consume();
 			}
 			
 		});
@@ -520,7 +541,7 @@ public class noplanA extends Application {
 			
 			public void handle(KeyEvent event) {
 				
-				if (inthelevel) {
+				if (inthelevel && !(paused || winner)) {
 					
 					switch (event.getCode()) {
 						case A:
@@ -555,6 +576,18 @@ public class noplanA extends Application {
 							
 							break;
 					}
+				
+				}
+				
+				if (inthelevel && !winner) {
+					
+					switch (event.getCode()) {
+						case P:
+							paused = !paused;
+							pausemenu.setVisible(paused);
+							pausemenu.toFront();
+							break;
+					}
 					
 				} else {
 					
@@ -579,7 +612,7 @@ public class noplanA extends Application {
 			
 			public void handle(KeyEvent event) {
 				
-				if (inthelevel) {
+				if (inthelevel && !winner) {
 					
 					switch (event.getCode()) {
 						case A:
@@ -622,8 +655,7 @@ public class noplanA extends Application {
 							break;
 					}
 					
-					if ((event.getText().equals("1") || event.getText().equals("2") || event.getText().equals("3") ||
-						 event.getText().equals("4") || event.getText().equals("5")) && numofcats < 50) {
+					if ((event.getText().equals("1") || event.getText().equals("2") || event.getText().equals("3") || event.getText().equals("4") || event.getText().equals("5")) && numofcats < 50) {
 						catdeployed = Integer.parseInt(event.getText());
 						
 						if (isRechargeDone(rechargearray, firstrow, catdeployed)) {
@@ -657,7 +689,7 @@ public class noplanA extends Application {
 		
 	//Keyboard action handling end
 		
-		enemyarray[0] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 120000, 120, 0, 0, 0, 355, 200, 150, 0, 0, /*0.2667*/ 5, 75, 0, 19750, 0, true, true, false, false, true);
+		enemyarray[0] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 120000, 120, 0, 0, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true);
 		numofenemies++;
 		
 		AnimationTimer timer = new AnimationTimer() {
@@ -665,7 +697,7 @@ public class noplanA extends Application {
 			
             public void handle(long now) {
 				
-				if (inthelevel && !loser) {
+				if (inthelevel && !loser && !paused) {
 					backgroundpicture = moveLR(backgroundpicture, leftkey, rightkey);
 					globaltimer++;
 					
@@ -675,37 +707,40 @@ public class noplanA extends Application {
 					
 					//spawning enemies schematics
 					/*
-					for (i = 0; i < linenumber; i++) {
-						
-						if (spawninstructions[i].firstspawn == globaltimer) {
-							enemyarray = addEnemy(enemyarray, numofenemies, spawninstructions[i].ID);
-							numofenemies++;
+					if (!winner) {
+					
+						for (i = 0; i < linenumber; i++) {
 							
-							if (spawninstructions[i].spawns != -1) {
-								spawninstructions[i].spawns--;
-							}
-							
-						}
-						
-						if (spawninstructions[i].spawns != 0 && spawninstructions[i].firstspawn < globaltimer) {
-						
-							if (spawninstructions[i].nextspawnrandom == 0) {
-								spawninstructions[i].nextspawnrandom = random.nextInt(spawninstructions[i].nextspawnsupper - spawninstructions[i].nextspawnslower + 1) +
-																	   spawninstructions[i].nextspawnslower;
-							} else if (spawninstructions[i].nextspawnframes == spawninstructions[i].nextspawnrandom && numofenemies < 12) {
+							if (spawninstructions[i].firstspawn == globaltimer) {
 								enemyarray = addEnemy(enemyarray, numofenemies, spawninstructions[i].ID);
 								numofenemies++;
-								spawninstructions[i].nextspawnframes = 0;
-								spawninstructions[i].nextspawnrandom = 0;
 								
 								if (spawninstructions[i].spawns != -1) {
 									spawninstructions[i].spawns--;
 								}
 								
-							} else if (numofenemies < 12) {
-								spawninstructions[i].nextspawnframes++;
 							}
-						
+							
+							if (spawninstructions[i].spawns != 0 && spawninstructions[i].firstspawn < globaltimer) {
+							
+								if (spawninstructions[i].nextspawnrandom == 0) {
+									spawninstructions[i].nextspawnrandom = random.nextInt(spawninstructions[i].nextspawnsupper - spawninstructions[i].nextspawnslower + 1) + spawninstructions[i].nextspawnslower;
+								} else if (spawninstructions[i].nextspawnframes == spawninstructions[i].nextspawnrandom && numofenemies < 12) {
+									enemyarray = addEnemy(enemyarray, numofenemies, spawninstructions[i].ID);
+									numofenemies++;
+									spawninstructions[i].nextspawnframes = 0;
+									spawninstructions[i].nextspawnrandom = 0;
+									
+									if (spawninstructions[i].spawns != -1) {
+										spawninstructions[i].spawns--;
+									}
+									
+								} else if (numofenemies < 12) {
+									spawninstructions[i].nextspawnframes++;
+								}
+							
+							}
+							
 						}
 						
 					}
@@ -730,7 +765,6 @@ public class noplanA extends Application {
 								if (!catarray[i].alive) {
 									catarray = removeCat(catarray, numofcats, i);
 									numofcats--;
-									break;
 								}
 								
 							} else {
@@ -739,7 +773,7 @@ public class noplanA extends Application {
 								tempround3 = -0.0225 * Math.pow(catarray[i].damageframedata, 2);
 								tempround4 = 2.7 * catarray[i].damageframedata;
 								
-								catarray[i].xpos -= catarray[i].speed + 1;
+								catarray[i].xpos++;
 								catarray[i].ypos = Math.abs(tempround1 + tempround2 + tempround3 + tempround4);
 							}
 							
@@ -837,16 +871,16 @@ public class noplanA extends Application {
 								catarray[i].idle = true;
 							}
 							
-						} else if (!(catarray[i].immunity || catarray[i].knockbackimmunity)) {
-							catarray = removeCat(catarray, numofcats, i);
-							numofcats--;
-							break;
+						} else if (catarray[i].alive) {
+							catarray[i].framedata = 0;
+							catarray[i].idle = true;
 						}
 						
 					}
 					
 					//enemy unit logic
 					for (i = 0; i < numofenemies; i++) {
+						System.out.println(enemyarray[i].health);
 						
 						if (enemyarray[i].health < 0) {
 							enemyarray[i].alive = false;
@@ -864,13 +898,12 @@ public class noplanA extends Application {
 								if (!enemyarray[i].alive) {
 									enemyarray = removeEnemy(enemyarray, numofenemies, i);
 									numofenemies--;
-									break;
 								}
 								
 							} else {
 								
 								if (enemyarray[i].xpos > 0) {
-									enemyarray[i].xpos -= enemyarray[i].speed + 1;
+									enemyarray[i].xpos--;
 								}
 								
 								tempround1 = 0.0000375 * Math.pow(enemyarray[i].damageframedata, 4);
@@ -925,7 +958,7 @@ public class noplanA extends Application {
 						}
 						
 						//at each frame, checks all cats to see if the enemy should stop moving
-						if (enemyarray[i].idle && enemyarray[i].alive) {
+						if (enemyarray[i].idle && enemyarray[i].alive && !(enemyarray[i].immunity || enemyarray[i].cannonimmunity)) {
 							allowmove = true;
 							
 							for (j = 0; j < numofcats && allowmove; j++) {
@@ -944,7 +977,7 @@ public class noplanA extends Application {
 							}
 							
 						//otherwise, increment framedata and see where in the attack cycle the enemy is
-						} else if (enemyarray[i].alive && !enemyarray[i].immunity && !enemyarray[i].cannonimmunity) {
+						} else if (enemyarray[i].alive && !(enemyarray[i].immunity || enemyarray[i].cannonimmunity)) {
 							enemyarray[i].framedata++;
 							
 							if (enemyarray[i].framedata == enemyarray[i].animation) {
@@ -991,12 +1024,17 @@ public class noplanA extends Application {
 					
 					//renders cat images
 					for (i = 0; i < 50; i++) {
-						unitID = catarray[i].ID;
-						unitanimation = catarray[i].animation;
-						unitbackswing = catarray[i].backswing;
-						unitframedata = catarray[i].framedata;
-						slotarray = RenderCats(unitID, unitanimation, unitbackswing, unitframedata, slotarray, i, catpictures, catpicturesanimation, 
-											   catpicturesattack, catpicturesbackswing);
+						
+						if (catarray[i].ID == 0) {
+							slotarray[i].setVisible(false);
+						} else {
+							unitID = catarray[i].ID;
+							unitanimation = catarray[i].animation;
+							unitbackswing = catarray[i].backswing;
+							unitframedata = catarray[i].framedata;
+							slotarray[i] = RenderCats(unitanimation, unitbackswing, unitframedata, slotarray, i, catpictures[unitID - 1], catpicturesanimation[unitID - 1], catpicturesattack[unitID - 1], catpicturesbackswing[unitID - 1]);
+						}
+						
 					}
 					
 					//positions cat images
@@ -1004,17 +1042,22 @@ public class noplanA extends Application {
 						unitxpos = catarray[i].xpos;
 						unitypos = catarray[i].ypos;
 						unitID = catarray[i].ID;
-						slotarray = PositionCats(slotarray, i, unitxpos, unitypos, backgroundpicture, catpictures, unitID);
+						slotarray[i] = PositionCats(slotarray, i, unitxpos, unitypos, backgroundpicture, catpictures[unitID - 1]);
 					}
 					
 					//renders enemy images
 					for (i = 0; i < 12; i++) {
-						unitID = enemyarray[i].ID;
-						unitanimation = enemyarray[i].animation;
-						unitbackswing = enemyarray[i].backswing;
-						unitframedata = enemyarray[i].framedata;
-						limitarray = RenderEnemies(unitID, unitanimation, unitbackswing, unitframedata, limitarray, i, enemypictures, enemypicturesanimation,
-												   enemypicturesattack, enemypicturesbackswing);
+						
+						if (enemyarray[i].ID == 0) {
+							limitarray[i].setVisible(false);
+						} else {
+							unitID = enemyarray[i].ID;
+							unitanimation = enemyarray[i].animation;
+							unitbackswing = enemyarray[i].backswing;
+							unitframedata = enemyarray[i].framedata;
+							limitarray[i] = RenderEnemies(unitanimation, unitbackswing, unitframedata, limitarray, i, enemypictures[unitID - 1], enemypicturesanimation[unitID - 1], enemypicturesattack[unitID - 1], enemypicturesbackswing[unitID - 1]);
+						}
+						
 					}
 					
 					//positions enemy images
@@ -1022,7 +1065,7 @@ public class noplanA extends Application {
 						unitxpos = enemyarray[i].xpos;
 						unitypos = enemyarray[i].ypos;
 						unitID = enemyarray[i].ID;
-						limitarray = PositionEnemies(limitarray, i, unitxpos, unitypos, backgroundpicture, enemypictures, unitID);
+						limitarray[i] = PositionEnemies(limitarray, i, unitxpos, unitypos, backgroundpicture, enemypictures[unitID - 1]);
 					}
 					
 					//adds money to the wallet when applicable
@@ -1104,6 +1147,54 @@ public class noplanA extends Application {
 					if (catbasehealth <= 0) {
 						backgroundpicture = DefeatScreen(backgroundpicture, defeatscreen, bosspercentage, enemyarray[0].health);
 						loser = true;
+					} /*else if (enemybasehealth <= 0) {
+						winner = true;
+						leftkey = false;
+						rightkey = false;
+						tempnumofenemies = numofenemies;
+						
+						for (i = 0; i < tempnumofenemies; i++) {
+							enemyarray = removeEnemy(enemyarray, numofenemies, i);
+							numofenemies--;
+						}
+						
+						for (i = 0; i < 10; i++) {
+							slotdisplay[i].setVisible(false);
+						}
+						
+						catbasehealthdisplay.setVisible(false);
+						enemybasehealthdisplay.setVisible(false);
+						workercaticon.setVisible(false);
+						workercatlevel.setVisible(false);
+						workercatcost.setVisible(false);
+						cannonicon.setVisible(false);
+						moneydisplay.setVisible(false);
+						victorytext.setVisible(true);
+						
+						delaytimer++;
+						
+						if (delaytimer == 90 && !stagecomplete) {
+							stagecomplete = true;
+							delaytimer = 0;
+							System.out.println("got catfood and energy");
+						} else if (delaytimer == 90 && !getcatway) {
+							getcatway = 30 > random.nextInt(100);
+							
+							if (getcatway) {
+								System.out.println("got unit");
+							}
+							
+						}
+						
+					}*/
+					
+					if (winner && backgroundpicture.getLayoutX() <= -40) {
+						backgroundpicture.setLayoutX(backgroundpicture.getLayoutX() + 40);
+						
+						if (backgroundpicture.getLayoutX() > 0) {
+							backgroundpicture.setLayoutX(0);
+						}
+						
 					}
 					
 				}
@@ -1142,8 +1233,8 @@ public class noplanA extends Application {
 		
 		textinstruct1[0] = new Text("Use 1 - 5 to deploy units in those slots, and tab to switch to the next line of slots.");
 		textinstruct1[1] = new Text("Use A/D to move left/right and W/D to zoom in/out.");
-		textinstruct1[2] = new Text("(ZOOM NOT IMPLEMENTED YET BECAUSE IT'S FREAKIN HARD MAN IDK HOW TO YET)");
-		textinstruct1[3] = new Text("To upgrade your worker cat level, press the up arrow.");
+		textinstruct1[2] = new Text("To upgrade your worker cat level, press the up arrow.");
+		textinstruct1[3] = new Text("Pause/unpause the game while in battle by pressing P.");
 		textinstruct1[4] = new Text("Finally, use Enter to fire the cat cannon.");
 		
 		for (int i1 = 0; i1 < 5; i1++) {
@@ -1175,13 +1266,12 @@ public class noplanA extends Application {
 		
 	}
 	
-	public static void setupLevel(ImageView startbackground1, ImageView selectstart1, ImageView selecthelp1, ImageView backgroundpicture1, Text moneydisplay1,
-								  ImageView workercaticon1, Text workercatlevel1, Text workercatcost1, ImageView cannonicon1, ImageView[] slotdisplay1,
-								  Text catbasehealthdisplay1, Text enemybasehealthdisplay1) {
+	public static void setupLevel(ImageView startbackground1, ImageView selectstart1, ImageView selecthelp1, ImageView backgroundpicture1, Text moneydisplay1, ImageView workercaticon1, Text workercatlevel1, Text workercatcost1, ImageView cannonicon1, ImageView[] slotdisplay1, Text catbasehealthdisplay1, Text enemybasehealthdisplay1) {
 		startbackground1.setVisible(false);
 		selectstart1.setVisible(false);
 		selecthelp1.setVisible(false);
 		backgroundpicture1.setVisible(true);
+		backgroundpicture1.toBack();
 		moneydisplay1.setVisible(true);
 		workercaticon1.setVisible(true);
 		workercatlevel1.setVisible(true);
@@ -1201,12 +1291,7 @@ public class noplanA extends Application {
 		truemoney1 -= workercat1 * 560;
 		workercat1++;
 		workercatlevel1.setText("Level " + workercat1);
-		
-		if (workercat1 < 8) {
-			workercatcost1.setText((workercat1 * 560) + "$");
-		} else {
-			workercatcost1.setText("MAX");
-		}
+		workercatcost1.setText(workercat1 < 8 ? (workercat1 * 560) + "$" : "MAX");
 		
 		return truemoney1;
 	}
@@ -1215,7 +1300,9 @@ public class noplanA extends Application {
 		
 		if (leftkey1 && backgroundpicture1.getLayoutX() < 0) {
 			backgroundpicture1.relocate(backgroundpicture1.getLayoutX() + 10, -380);
-		} else if (rightkey1 && backgroundpicture1.getLayoutX() > -800) {
+		}
+		
+		if (rightkey1 && backgroundpicture1.getLayoutX() > -800) {
 			backgroundpicture1.relocate(backgroundpicture1.getLayoutX() - 10, -380);
 		}
 		
@@ -1275,11 +1362,11 @@ public class noplanA extends Application {
 			switch (catdeployed1) {
 				case 1: catarray1[numofcats1] = new FieldCats(6, 0, 9435, 9435, 4, 0, 24, 3400, 71, 64, 0, 0, 200, 0, 0, 1.4, 1375, 0, 525, false, true, false, false, true, false, false, true);
 				break;
-				case 2: catarray1[numofcats1] = new FieldCats(7, 28, 15300, 15300, 1, 0, 2, 25500, /*400*/ 2, 0, 0, 0, 14, 0, 0, 5, 1375, 0, 750, false, false, false, true, true, false, false, true);
+				case 2: catarray1[numofcats1] = new FieldCats(7, 28, 15300, 15300, 1, 0, 1, /*25500*/ 1, /*400*/ 1, 0, 0, 0, 14, 0, 0, /*5*/ 500, 1375, 0, 750, false, false, false, true, true, false, false, true);
 				break;
 				case 3: catarray1[numofcats1] = new FieldCats(8, 0, 26100, 26100, 5, 0, 12, 682, 8, 0, 0, 0, 140, 0, 0, 4.4, 1375, 0, 750, true, false, false, false, true, false, false, true);
 				break;
-				case 4: catarray1[numofcats1] = new FieldCats(9, 95, 15660, 15660, 4, 0, 40, 10497, 42, 80, 0, 0, 85, 0, 0, 0.6667, 1375, 0, 975, true, false, false, false, true, false, false, true);
+				case 4: catarray1[numofcats1] = new FieldCats(9, 95, 15660, 15660, 4, 0, 40, 10497, 42, 80, 0, 0, 85, 0, 0, 0.6667, 1375, 0, /* 975 */ 0, true, false, false, false, true, false, false, true);
 				break;
 				case 5: catarray1[numofcats1] = new FieldCats(10, 0, 25500, 25500, 6, 0, 0, 85000, 0, 0, 0, 0, 200, 0, 0, 4, 1375, 0, 4500, true, false, false, false, true, false, false, true);
 				break;
@@ -1321,79 +1408,41 @@ public class noplanA extends Application {
 		return allowmove1;
 	}
 	
-	public static ImageView[] RenderCats(int unitID1, int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] slotarray1, int i1,
-										 Image[] catpictures1, Image[] catpicturesanimation1, Image[] catpicturesattack1, Image[] catpicturesbackswing1) {
+	public static ImageView RenderCats(int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] slotarray1, int i1, Image unitpictures1, Image unitpicturesanimation1, Image unitpicturesattack1, Image unitpicturesbackswing1) {
+		slotarray1[i1].setImage(unitframedata1 > unitanimation1 + (0.25 * unitbackswing1) ? unitpicturesbackswing1 :
+								unitframedata1 >= unitanimation1 ? unitpicturesattack1 :
+								unitframedata1 != 0 ? unitpicturesanimation1 :
+								unitpictures1);
+		slotarray1[i1].setVisible(true);
 		
-		if (unitID1 != 0) {
-			
-			if (unitframedata1 > unitanimation1 + 6) {
-				slotarray1[i1].setImage(catpicturesbackswing1[unitID1 - 1]);
-			} else if (unitframedata1 >= unitanimation1) {
-				slotarray1[i1].setImage(catpicturesattack1[unitID1 - 1]);
-			} else if (unitframedata1 != 0) {
-				slotarray1[i1].setImage(catpicturesanimation1[unitID1 - 1]);
-			} else {
-				slotarray1[i1].setImage(catpictures1[unitID1 - 1]);
-			}
-			
-			slotarray1[i1].setVisible(true);
-		} else {
-			slotarray1[i1].setVisible(false);
-		}
-		
-		return slotarray1;
+		return slotarray1[i1];
 	}
 	
-	public static ImageView[] PositionCats(ImageView[] slotarray1, int i1, double unitxpos1, double unitypos1, ImageView backgroundpicture1,
-										   Image[] catpictures1, int unitID1) {
-		slotarray1[i1].relocate(unitxpos1 + backgroundpicture1.getLayoutX(), 275 - unitypos1 - catpictures1[unitID1 - 1].getHeight());
-		return slotarray1;
+	public static ImageView PositionCats(ImageView[] slotarray1, int i1, double unitxpos1, double unitypos1, ImageView backgroundpicture1, Image unitpictures1) {
+		slotarray1[i1].relocate(unitxpos1 + backgroundpicture1.getLayoutX(), 275 - unitypos1 - unitpictures1.getHeight());
+		return slotarray1[i1];
 	}
 	
-	public static ImageView[] RenderEnemies(int unitID1, int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] limitarray1, int i1,
-										    Image[] enemypictures1, Image[] enemypicturesanimation1, Image[] enemypicturesattack1, Image[] enemypicturesbackswing1) {
+	public static ImageView RenderEnemies(int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] limitarray1, int i1, Image unitpictures1, Image unitpicturesanimation1, Image unitpicturesattack1, Image unitpicturesbackswing1) {
+		limitarray1[i1].setImage(unitframedata1 > unitanimation1 + (0.25 * unitbackswing1) ? unitpicturesbackswing1 :
+								 unitframedata1 >= unitanimation1 ? unitpicturesattack1 :
+								 unitframedata1 != 0 ? unitpicturesanimation1 :
+								 unitpictures1);
+		limitarray1[i1].setVisible(true);
 		
-		if (unitID1 != 0) {
-			
-			if (unitframedata1 > unitanimation1 + (0.25 * unitbackswing1)) {
-				limitarray1[i1].setImage(enemypicturesbackswing1[unitID1 - 1]);
-			} else if (unitframedata1 >= unitanimation1) {
-				limitarray1[i1].setImage(enemypicturesattack1[unitID1 - 1]);
-			} else if (unitframedata1 != 0) {
-				limitarray1[i1].setImage(enemypicturesanimation1[unitID1 - 1]);
-			} else {
-				limitarray1[i1].setImage(enemypictures1[unitID1 - 1]);
-			}
-			
-			limitarray1[i1].setVisible(true);
-		} else {
-			limitarray1[i1].setVisible(false);
-		}
-		
-		return limitarray1;
+		return limitarray1[i1];
 	}
 	
-	public static ImageView[] PositionEnemies(ImageView[] limitarray1, int i1, double unitxpos1, double unitypos1, ImageView backgroundpicture1,
-											  Image[] enemypictures1, int unitID1) {
-		limitarray1[i1].relocate(unitxpos1 + backgroundpicture1.getLayoutX(), 275 - unitypos1 - enemypictures1[unitID1 - 1].getHeight());
-		return limitarray1;
+	public static ImageView PositionEnemies(ImageView[] limitarray1, int i1, double unitxpos1, double unitypos1, ImageView backgroundpicture1, Image  unitpictures1) {
+		limitarray1[i1].relocate(unitxpos1 + backgroundpicture1.getLayoutX(), 275 - unitypos1 - unitpictures1.getHeight());
+		return limitarray1[i1];
 	}
 	
 	public static double IncomeGeneration(double truemoney1, int maxmoney1, int workercat1) {
-		
-		if (truemoney1 <= maxmoney1) {
-			truemoney1 += ((workercat1 * 9.44286) + 175.007) / 6;
-		}
-		
-		if (truemoney1 > maxmoney1) {
-			truemoney1 = maxmoney1;
-		}
-		
-		return truemoney1;
+		return (truemoney1 = truemoney1 + ((workercat1 * 9.44286) + 175.007) / 6 <= maxmoney1 ? truemoney1 + ((workercat1 * 9.44286) + 175.007) / 6 : maxmoney1);
 	}
 	
-	public static boolean ChangeWorkerCatIcon(boolean canaffordupgrade1, double truemoney1, int workercat1, ImageView workercaticon1, Image workercatactive1,
-											  Image workercatidle1, Text workercatlevel1, Color active1, Color idle1) {
+	public static boolean ChangeWorkerCatIcon(boolean canaffordupgrade1, double truemoney1, int workercat1, ImageView workercaticon1, Image workercatactive1, Image workercatidle1, Text workercatlevel1, Color active1, Color idle1) {
 		
 		if (!canaffordupgrade1 && truemoney1 > workercat1 * 560) {
 			canaffordupgrade1 = true;
@@ -1413,12 +1462,7 @@ public class noplanA extends Application {
 		backgroundpicture1.relocate(0, 0);
 		backgroundpicture1.toFront();
 		
-		if (clionelhealth1 / 24000 < 1) {
-			bosspercentage1.setText("1%");
-		} else {
-			bosspercentage1.setText(Integer.toString(Math.round(clionelhealth1 / 24000)) + "%");
-		}
-		
+		bosspercentage1.setText(clionelhealth1 / 24000 < 1 ? "1%" : Integer.toString(Math.round(clionelhealth1 / 24000)) + "%");
 		bosspercentage1.setVisible(true);
 		bosspercentage1.toFront();
 		
