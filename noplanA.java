@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -17,14 +18,12 @@ import java.util.*;
 //Importing my stuff
 
 class FieldCats {
-	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, cooldown, framedata, cooldownframedata, range,
-		damageframedata, knockbackframedata, price;
+	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, cooldown, framedata, cooldownframedata, range, damageframedata, knockbackframedata, price;
 	double speed, xpos, ypos;
 	boolean area, massivedamage, resistance, doublecash, idle, immunity, knockbackimmunity, alive;
+	Image idleimage, animationimage, attackimage, backswingimage;
 	
-	FieldCats(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int cooldown,
-			  int framedata, int cooldownframedata, int range, int damageframedata, int knockbackframedata, double speed, double xpos, double ypos, int price,
-			  boolean area, boolean massivedamage, boolean resistance, boolean doublecash, boolean idle, boolean immunity, boolean knockbackimmunity, boolean alive) {
+	FieldCats(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int cooldown, int framedata, int cooldownframedata, int range, int damageframedata, int knockbackframedata, double speed, double xpos, double ypos, int price, boolean area, boolean massivedamage, boolean resistance, boolean doublecash, boolean idle, boolean immunity, boolean knockbackimmunity, boolean alive, Image idleimage, Image animationimage, Image attackimage, Image backswingimage) {
 		this.ID = ID;
 		this.baseline = baseline;
 		this.maxhealth = maxhealth;
@@ -52,6 +51,27 @@ class FieldCats {
 		this.immunity = immunity;
 		this.knockbackimmunity = knockbackimmunity;
 		this.alive = alive;
+		this.idleimage = idleimage;
+		this.animationimage = animationimage;
+		this.attackimage = attackimage;
+		this.backswingimage = backswingimage;
+	}
+	
+	public boolean allowMovement(double enemyxpos, int enemybaseline, boolean enemyimmunity, boolean enemycannonimmunity) {
+		return !(xpos + baseline - range < enemyxpos + enemybaseline && xpos + baseline > enemyxpos + enemybaseline && !(enemyimmunity || enemycannonimmunity));
+	}
+	
+	public void render(ImageView tempimageview) {
+		tempimageview.setImage(framedata > animation + 8 ? backswingimage :
+								framedata >= animation ? attackimage :
+								framedata != 0 ? animationimage :
+								idleimage);
+		return;
+	}
+	
+	public void position(ImageView tempimageview, double backgroundpicturexpos) {
+		tempimageview.relocate(xpos + backgroundpicturexpos, 275 - ypos - idleimage.getHeight());
+		return;
 	}
 	
 }
@@ -60,8 +80,9 @@ class FieldEnemies {
 	int ID, baseline, maxhealth, health, knockbacks, knockbackcount, animation, damage, backswing, cooldown, framedata, cooldownframedata, range, aggrorange, minrange, damageframedata, cannonframedata, pricedrop, knockbackchance;
 	double speed, xpos, ypos;
 	boolean area, idle, immunity, cannonimmunity, alive;
+	Image idleimage, animationimage, attackimage, backswingimage;
 	
-	FieldEnemies(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int cooldown, int framedata, int cooldownframedata, int range, int aggrorange, int minrange, int damageframedata, int cannonframedata, double speed, double xpos, double ypos, int pricedrop, int knockbackchance, boolean area, boolean idle, boolean immunity, boolean cannonimmunity, boolean alive) {
+	FieldEnemies(int ID, int baseline, int maxhealth, int health, int knockbacks, int knockbackcount, int animation, int damage, int backswing, int cooldown, int framedata, int cooldownframedata, int range, int aggrorange, int minrange, int damageframedata, int cannonframedata, double speed, double xpos, double ypos, int pricedrop, int knockbackchance, boolean area, boolean idle, boolean immunity, boolean cannonimmunity, boolean alive, Image idleimage, Image animationimage, Image attackimage, Image backswingimage) {
 		this.ID = ID;
 		this.baseline = baseline;
 		this.maxhealth = maxhealth;
@@ -89,6 +110,23 @@ class FieldEnemies {
 		this.immunity = immunity;
 		this.cannonimmunity = cannonimmunity;
 		this.alive = alive;
+		this.idleimage = idleimage;
+		this.animationimage = animationimage;
+		this.attackimage = attackimage;
+		this.backswingimage = backswingimage;
+	}
+	
+	public void render(ImageView tempimageview) {
+		tempimageview.setImage(framedata > animation + 8 ? backswingimage :
+								framedata >= animation ? attackimage :
+								framedata != 0 ? animationimage :
+								idleimage);
+		return;
+	}
+	
+	public void position(ImageView tempimageview, double backgroundpicturexpos) {
+		tempimageview.relocate(xpos + backgroundpicturexpos, 275 - ypos - idleimage.getHeight());
+		return;
 	}
 	
 }
@@ -101,6 +139,44 @@ class DeploySlots {
 		this.maxrecharge = maxrecharge;
 		this.lastdeployed = lastdeployed;
 		this.ready = ready;
+	}
+	
+	public void assignRechargeTimes(int tempcatID) {
+		
+		switch (tempcatID) {
+			case 0:
+				maxrecharge = 4467;
+				break;
+			case 1:
+				maxrecharge = 3133;
+				break;
+			case 2:
+				maxrecharge = 5800;
+				break;
+			case 3:
+				maxrecharge = 8667;
+				break;
+			case 4:
+				maxrecharge = 2467;
+				break;
+			case 5:
+				maxrecharge = 4467;
+				break;
+			case 6:
+				maxrecharge = 17800;
+				break;
+			case 7:
+				maxrecharge = 2800;
+				break;
+			case 8:
+				maxrecharge = 2133;
+				break;
+			case 9:
+				maxrecharge = 96467;
+				break;
+		}
+		
+		return;
 	}
 	
 }
@@ -126,7 +202,7 @@ public class noplanA extends Application {
 	Application.launch(args); //Launches application
  }
  
-	int i, j, k, catdeployed, deleteunit, unitID, unitanimation, unitbackswing, unitframedata, money, success;
+	int i, j, k, catdeployed, deleteunit, money, success;
 	int truewavexpos = -40;
 	int numofcats, numofenemies, tempnumofenemies, cannonrecharge, linenumber = 0;
 	int lowestunit = -1;
@@ -138,7 +214,7 @@ public class noplanA extends Application {
 	double truemoney, wavexpos, tempround1, tempround2, tempround3, tempround4 = 0;
 	long globaltimer, delaytimer = 0;
 	boolean inthelevel, leftkey, rightkey, allowmove, firstrow, canaffordupgrade, activecannon;
-	boolean godmode, winner, loser, paused, stagecomplete, getcatway = false;
+	boolean godmode, winner, loser, paused, stagecomplete, getcatway, firsttimewinner, tonextbox = false;
 	
 	FieldCats catarray[] = new FieldCats[50];
 	FieldEnemies enemyarray[] = new FieldEnemies[12];
@@ -146,15 +222,7 @@ public class noplanA extends Application {
 	EnemySchematics spawninstructions[] = new EnemySchematics[100];
 	
 	ImageView slotarray[] = new ImageView[50];
-	Image catpictures[] = new Image[11];
-	Image catpicturesanimation[] = new Image[11];
-	Image catpicturesattack[] = new Image[11];
-	Image catpicturesbackswing[] = new Image[11];
 	ImageView limitarray[] = new ImageView[12];
-	Image enemypictures[] = new Image[4];
-	Image enemypicturesanimation[] = new Image[4];
-	Image enemypicturesattack[] = new Image[4];
-	Image enemypicturesbackswing[] = new Image[4];
 	Text textinstruct[] = new Text[5];
 	Image slotpictures[] = new Image[11];
 	Image slotpicturesidle[] = new Image[11];
@@ -165,12 +233,17 @@ public class noplanA extends Application {
 	ImageView startbackground = new ImageView();
 	ImageView selectstart = new ImageView();
 	ImageView selecthelp = new ImageView();
+	ImageView whitebackground = new ImageView();
 	ImageView toMenu = new ImageView();
 	ImageView backgroundpicture = new ImageView();
 	ImageView workercaticon = new ImageView();
 	ImageView cannonicon = new ImageView();
 	ImageView catcannonwave = new ImageView();
 	ImageView pausemenu = new ImageView();
+	ImageView selectpausehelp = new ImageView();
+	ImageView catwayunlock = new ImageView();
+	ImageView firsttimereward = new ImageView();
+	ImageView levelfinish = new ImageView();
 	Line cannonlaser = new Line();
 	
 	Text moneydisplay = new Text();
@@ -180,9 +253,14 @@ public class noplanA extends Application {
 	Text enemybasehealthdisplay = new Text();
 	Text bosspercentage = new Text();
 	Text victorytext = new Text();
+	Text catwaytext = new Text();
+	Text firstcatfoodtext = new Text();
+	Text firstenergytext = new Text();
 	
 	Color idle = Color.rgb(195, 195, 195);
 	Color active = Color.rgb(255, 242, 0);
+	Color purpleflash = Color.rgb(239, 60, 200);
+	Color yellowflash = Color.rgb(243, 228, 51);
 	
 	byte inbuf[] = new byte[20500];     //Input buffer for the whole file
 	String str = new String();
@@ -195,6 +273,7 @@ public class noplanA extends Application {
 		Image logo = new Image("Battle_Cats_Logo.png");
 		Image startbutton = new Image("Start_Button.png");
 		Image helpbutton = new Image("Help_Button.png");
+		Image whitescreen = new Image("White_Screen.png");
 		Image exithelpbutton = new Image("Exit_Help_Button.png");
 		Image background = new Image("Background_Picture.png");
 		Image workercatidle = new Image("Worker_Cat_Idle.png");
@@ -202,6 +281,10 @@ public class noplanA extends Application {
 		Image wave = new Image("Cat_Cannon_Wave.png");
 		Image defeatscreen = new Image("Defeat_Screen.png");
 		Image pause = new Image("Pause_Menu.png");
+		Image pausehelpbutton = new Image("Pause_Help_Button.png");
+		Image catway = new Image("Unlocked_Catway_Box.png");
+		Image firsttime = new Image("First_Time_Box.png");
+		Image ok = new Image("Ok_Button.png");
 		
 		startbackground.setImage(logo);
 		
@@ -212,6 +295,9 @@ public class noplanA extends Application {
 		selecthelp.setImage(helpbutton);
 		selecthelp.setLayoutX(250);
 		selecthelp.setLayoutY(310);
+		
+		whitebackground.setImage(whitescreen);
+		whitebackground.setVisible(false);
 		
 		toMenu.setImage(exithelpbutton);
 		toMenu.setLayoutX(750);
@@ -231,20 +317,23 @@ public class noplanA extends Application {
 		moneydisplay.setLayoutX(590);
 		moneydisplay.setLayoutY(25);
 		moneydisplay.setFont(Font.font("Verdana", FontWeight.BOLD, 24));
+		moneydisplay.setStroke(Color.BLACK);
 		moneydisplay.setFill(Color.rgb(250, 203, 1));
 		moneydisplay.setVisible(false);
 		
 		workercatlevel.setText("Level 1");
-		workercatlevel.setLayoutX(5);
-		workercatlevel.setLayoutY(295);
-		workercatlevel.setFont(Font.font("Verdana", FontWeight.BOLD, 16));
+		workercatlevel.setLayoutX(2);
+		workercatlevel.setLayoutY(310);
+		workercatlevel.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
+		workercatlevel.setStroke(Color.BLACK);
 		workercatlevel.setFill(idle);
 		workercatlevel.setVisible(false);
 		
 		workercatcost.setText("560$");
-		workercatcost.setLayoutX(5);
-		workercatcost.setLayoutY(372);
-		workercatcost.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+		workercatcost.setLayoutX(2);
+		workercatcost.setLayoutY(375);
+		workercatcost.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+		workercatcost.setStroke(Color.BLACK);
 		workercatcost.setFill(Color.rgb(232, 220, 0));
 		workercatcost.setVisible(false);
 		
@@ -264,17 +353,21 @@ public class noplanA extends Application {
 		catbasehealthdisplay.setText(Integer.toString(catbasehealth) + "/120000");
 		catbasehealthdisplay.setLayoutX(800);
 		catbasehealthdisplay.setLayoutY(105);
-		catbasehealthdisplay.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+		catbasehealthdisplay.setFont(Font.font("Verdana", FontWeight.BOLD, 16));
+		catbasehealthdisplay.setStroke(Color.BLACK);
+		catbasehealthdisplay.setFill(Color.WHITE);
 		
 		enemybasehealthdisplay.setText(Integer.toString(enemybasehealth) + "/750000");
 		enemybasehealthdisplay.setLayoutX(800);
 		enemybasehealthdisplay.setLayoutY(105);
-		enemybasehealthdisplay.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+		enemybasehealthdisplay.setFont(Font.font("Verdana", FontWeight.BOLD, 16));
+		enemybasehealthdisplay.setStroke(Color.BLACK);
+		enemybasehealthdisplay.setFill(Color.WHITE);
 		
 		bosspercentage.setLayoutX(425);
 		bosspercentage.setLayoutY(323);
 		bosspercentage.setFont(Font.font("Verdana", 20));
-		bosspercentage.setFill(Color.rgb(255, 255, 255));
+		bosspercentage.setFill(Color.WHITE);
 		bosspercentage.setVisible(false);
 		
 		pausemenu.setImage(pause);
@@ -282,14 +375,54 @@ public class noplanA extends Application {
 		pausemenu.setLayoutY(40);
 		pausemenu.setVisible(false);
 		
+		selectpausehelp.setImage(pausehelpbutton);
+		selectpausehelp.setLayoutX(280);
+		selectpausehelp.setLayoutY(225);
+		selectpausehelp.setVisible(false);
+		
 		victorytext.setText("Victory!!!");
 		victorytext.setLayoutX(290);
 		victorytext.setLayoutY(120);
 		victorytext.setFont(Font.font("Verdana", FontWeight.BOLD, 50));
+		victorytext.setStroke(Color.BLACK);
+		victorytext.setStrokeWidth(3);
 		victorytext.setFill(Color.WHITE);
 		victorytext.setVisible(false);
 		
-		Group root = new Group(startbackground, selectstart, selecthelp, toMenu, backgroundpicture, moneydisplay, workercaticon, workercatlevel, workercatcost, cannonicon, catcannonwave, cannonlaser, catbasehealthdisplay, enemybasehealthdisplay, bosspercentage, pausemenu, victorytext);
+		catwayunlock.setImage(catway);
+		catwayunlock.setLayoutX(141);
+		catwayunlock.setLayoutY(230);
+		catwayunlock.setVisible(false);
+		
+		catwaytext.setText("You can't get it from the Upgrades screen.");
+		catwaytext.setLayoutX(190);
+		catwaytext.setLayoutY(320);
+		catwaytext.setFont(Font.font("Verdana", 20));
+		catwaytext.setVisible(false);
+		
+		firsttimereward.setImage(firsttime);
+		firsttimereward.setLayoutX(141);
+		firsttimereward.setLayoutY(230);
+		firsttimereward.setVisible(false);
+		
+		firstcatfoodtext.setText("30 Cat Food!!");
+		firstcatfoodtext.setLayoutX(378);
+		firstcatfoodtext.setLayoutY(295);
+		firstcatfoodtext.setFont(Font.font("Verdana", 20));
+		firstcatfoodtext.setVisible(false);
+		
+		firstenergytext.setText("fully recovered!!");
+		firstenergytext.setLayoutX(415);
+		firstenergytext.setLayoutY(320);
+		firstenergytext.setFont(Font.font("Verdana", 20));
+		firstenergytext.setVisible(false);
+		
+		levelfinish.setImage(ok);
+		levelfinish.setLayoutX(253);
+		levelfinish.setLayoutY(300);
+		levelfinish.setVisible(false);
+		
+		Group root = new Group(startbackground, selectstart, selecthelp, whitebackground, toMenu, backgroundpicture, moneydisplay, workercaticon, workercatlevel, workercatcost, cannonicon, catcannonwave, cannonlaser, catbasehealthdisplay, enemybasehealthdisplay, bosspercentage, pausemenu, selectpausehelp, victorytext, catwayunlock, catwaytext, firsttimereward, firstcatfoodtext, firstenergytext, levelfinish);
 		Scene scene = new Scene(root, 800, 380);
 		
 	//Filling arrays used in application
@@ -297,7 +430,7 @@ public class noplanA extends Application {
 		if (true) {
 			
 			for (i = 0; i < 50; i++) {
-				catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+				catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
 				
 				slotarray[i] = new ImageView();
 				slotarray[i].setVisible(false);
@@ -305,49 +438,21 @@ public class noplanA extends Application {
 			}
 			
 			for (i = 0; i < 12; i++) {
-				enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
+				enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
 				
 				limitarray[i] = new ImageView();
 				limitarray[i].setVisible(false);
 				root.getChildren().add(limitarray[i]);
 			}
 			
-			/*
-			for (i = 1; i < 12; i++) {
-				catpictures[i - 1] = new Image("Unit_ID_" + i + ".png");
-				catpicturesanimation[i - 1] = new Image("Unit_ID_" + i + "_Animation.png");
-				catpicturesattack[i - 1] = new Image("Unit_ID_" + i + "_Attack.png");
-				catpicturesbackswing[i - 1] = new Image("Unit_ID_" + i + "_Backswing.png");
-			}
-			*/
-			
-			catpictures[0] = new Image("Unit_ID_" + 1 + ".png");
-			catpicturesanimation[0] = new Image("Unit_ID_" + 1 + "_Animation.png");
-			catpicturesattack[0] = new Image("Unit_ID_" + 1 + "_Attack.png");
-			catpicturesbackswing[0] = new Image("Unit_ID_" + 1 + "_Backswing.png");
-			
-			catpictures[6] = new Image("Unit_ID_" + 7 + ".png");
-			catpicturesanimation[6] = new Image("Unit_ID_" + 7 + "_Animation.png");
-			catpicturesattack[6] = new Image("Unit_ID_" + 7 + "_Attack.png");
-			catpicturesbackswing[6] = new Image("Unit_ID_" + 7 + "_Backswing.png");
-			
-			catpictures[8] = new Image("Unit_ID_" + 9 + ".png");
-			catpicturesanimation[8] = new Image("Unit_ID_" + 9 + "_Animation.png");
-			catpicturesattack[8] = new Image("Unit_ID_" + 9 + "_Attack.png");
-			catpicturesbackswing[8] = new Image("Unit_ID_" + 9 + "_Backswing.png");
-			
 			for (i = 0; i < 10; i++) {
 				rechargearray[i] = new DeploySlots(0, 0, true);
-			}
-			
-			for (i = 1; i < 5; i++) {
-				enemypictures[i - 1] = new Image("Enemy_ID_" + i + ".png");
-			}
-			
-			for (i = 1; i < 2; i++) {
-				enemypicturesanimation[i - 1] = new Image("Enemy_ID_" + i + "_Animation.png");
-				enemypicturesattack[i - 1] = new Image("Enemy_ID_" + i + "_Attack.png");
-				enemypicturesbackswing[i - 1] = new Image("Enemy_ID_" + i + "_Backswing.png");
+				rechargearray[i].assignRechargeTimes(i);
+				
+				rechargerects[i] = new Rectangle(132 + ((i % 5) * 110), 356, 0, 10);
+				rechargerects[i].setFill(Color.rgb(81, 255, 220));
+				rechargerects[i].setVisible(false);
+				root.getChildren().add(rechargerects[i]);
 			}
 			
 			for (i = 1; i < 12; i++) {
@@ -376,15 +481,6 @@ public class noplanA extends Application {
 			for (i = 1; i < 6; i++) {
 				catcannonicons[i - 1] = new Image("Cat_Cannon_Icon_" + i + ".png");
 			}
-			
-			for (i = 0; i < 10; i++) {
-				rechargerects[i] = new Rectangle(132 + (i * 110), 356, 0, 10);
-				rechargerects[i].setFill(Color.rgb(81, 255, 220));
-				rechargerects[i].setVisible(false);
-				root.getChildren().add(rechargerects[i]);
-			}
-			
-			rechargearray = AssignRechargeTimes(rechargearray);
 			
 		}
 		
@@ -449,7 +545,7 @@ public class noplanA extends Application {
 			@Override
 			
 			public void handle(MouseEvent event) {
-				Instructions(scene, startbackground, selectstart, selecthelp, toMenu, textinstruct);
+				Instructions(whitebackground, toMenu, textinstruct, paused);
 				root.getChildren().addAll(textinstruct[0], textinstruct[1], textinstruct[2], textinstruct[3], textinstruct[4]);
 				event.consume();
 			}
@@ -474,6 +570,21 @@ public class noplanA extends Application {
 				canaffordupgrade = false;
 				activecannon = false;
 				event.consume();
+			}
+			
+		});
+		
+		selectpausehelp.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
+				if (paused) {
+					Instructions(whitebackground, toMenu, textinstruct, paused);
+					root.getChildren().addAll(textinstruct[0], textinstruct[1], textinstruct[2], textinstruct[3], textinstruct[4]);
+					event.consume();
+				}
+				
 			}
 			
 		});
@@ -503,12 +614,12 @@ public class noplanA extends Application {
 					}
 					
 					for (i = 0; i < 50; i++) {
-						catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+						catarray[i] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
 						slotarray[i].setVisible(false);
 					}
 					
 					for (i = 0; i < 12; i++) {
-						enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
+						enemyarray[i] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
 						limitarray[i].setVisible(false);
 					}
 					
@@ -527,6 +638,103 @@ public class noplanA extends Application {
 				}
 				
 				event.consume();
+			}
+			
+		});
+		
+		catwayunlock.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
+				if (delaytimer >= 90) {
+					catwayunlock.setVisible(false);
+					catwaytext.setVisible(false);
+					
+					delaytimer = 90;
+					tonextbox = true;
+				}
+				
+			}
+			
+		});
+		
+		catwaytext.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
+				if (delaytimer >= 90) {
+					catwayunlock.setVisible(false);
+					catwaytext.setVisible(false);
+					
+					delaytimer = 90;
+					tonextbox = true;
+				}
+				
+			}
+			
+		});
+		
+		firsttimereward.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
+				if (delaytimer >= 90) {
+					firsttimereward.setVisible(false);
+					firstcatfoodtext.setVisible(false);
+					firstenergytext.setVisible(false);
+					
+					delaytimer = 0;
+					tonextbox = true;
+				}
+				
+			}
+			
+		});
+		
+		firstcatfoodtext.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
+				if (delaytimer >= 90) {
+					firsttimereward.setVisible(false);
+					firstcatfoodtext.setVisible(false);
+					firstenergytext.setVisible(false);
+					
+					delaytimer = 0;
+					tonextbox = true;
+				}
+				
+			}
+			
+		});
+		
+		firstenergytext.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
+				if (delaytimer >= 90) {
+					firsttimereward.setVisible(false);
+					firstcatfoodtext.setVisible(false);
+					firstenergytext.setVisible(false);
+					
+					delaytimer = 0;
+					tonextbox = true;
+				}
+				
+			}
+			
+		});
+		
+		levelfinish.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			
+			public void handle(MouseEvent event) {
+				
 			}
 			
 		});
@@ -586,6 +794,8 @@ public class noplanA extends Application {
 							paused = !paused;
 							pausemenu.setVisible(paused);
 							pausemenu.toFront();
+							selectpausehelp.setVisible(paused);
+							selectpausehelp.toFront();
 							break;
 					}
 					
@@ -674,7 +884,7 @@ public class noplanA extends Application {
 								slotdisplay[catdeployed - 1].setImage(slotpicturesidle[catdeployed - 1]);
 								rechargerects[catdeployed - 1].setVisible(true);
 							} else {
-								catarray[numofcats] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+								catarray[numofcats] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
 							}
 							
 						}
@@ -689,7 +899,7 @@ public class noplanA extends Application {
 		
 	//Keyboard action handling end
 		
-		enemyarray[0] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 120000, 120, 0, 0, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true);
+		enemyarray[0] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 120000, 120, 0, 0, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true, new Image("Enemy_ID_1.png"), new Image("Enemy_ID_1_Animation.png"), new Image("Enemy_ID_1_Attack.png"), new Image("Enemy_ID_1_Backswing.png"));
 		numofenemies++;
 		
 		AnimationTimer timer = new AnimationTimer() {
@@ -805,12 +1015,20 @@ public class noplanA extends Application {
 							catarray[i].idle = false;
 						}
 						
+						if (catarray[i].framedata > catarray[i].animation || catarray[i].framedata == 0) {
+							catarray[i].cooldownframedata++;
+						}
+						
 						//at each frame, checks all enemies to see if the cat should stop moving
 						if (catarray[i].idle && catarray[i].alive && !(catarray[i].immunity || catarray[i].knockbackimmunity)) {
 							allowmove = true;
 							
 							for (j = 0; j < numofenemies && allowmove; j++) {
-								allowmove = StopMoving(catarray[i].xpos, catarray[i].baseline, catarray[i].range, enemyarray[j].xpos, enemyarray[j].baseline, enemyarray[j].immunity, enemyarray[j].cannonimmunity);
+								
+								if (allowmove) {
+									allowmove = catarray[i].allowMovement(enemyarray[j].xpos, enemyarray[j].baseline, enemyarray[j].immunity, enemyarray[j].cannonimmunity);
+								}
+								
 							}
 							
 							if (allowmove) {
@@ -820,7 +1038,7 @@ public class noplanA extends Application {
 							}
 						
 						//otherwise, increment framedata and see where in the attack cycle the cat is
-						} else if (catarray[i].alive && !(catarray[i].immunity || catarray[i].knockbackimmunity)) {
+						} else if (catarray[i].alive && !(catarray[i].immunity || catarray[i].knockbackimmunity) && (catarray[i].cooldownframedata >= catarray[i].cooldown || catarray[i].framedata >= catarray[i].animation)) {
 							catarray[i].framedata++;
 							
 							if (catarray[i].framedata == catarray[i].animation) {
@@ -866,6 +1084,7 @@ public class noplanA extends Application {
 								}
 								
 								lowestunit = -1;
+								catarray[i].cooldownframedata = 0;
 							} else if (catarray[i].framedata == catarray[i].animation + catarray[i].backswing) {
 								catarray[i].framedata = 0;
 								catarray[i].idle = true;
@@ -880,7 +1099,6 @@ public class noplanA extends Application {
 					
 					//enemy unit logic
 					for (i = 0; i < numofenemies; i++) {
-						System.out.println(enemyarray[i].health);
 						
 						if (enemyarray[i].health < 0) {
 							enemyarray[i].alive = false;
@@ -916,8 +1134,7 @@ public class noplanA extends Application {
 						}
 						
 						//cannon knockback animation
-						if (activecannon && ((enemyarray[i].xpos > 1200 - (wavexpos * 50) && enemyarray[i].xpos < 1300 - (wavexpos * 50)) ||
-							enemyarray[i].cannonimmunity) && (!enemyarray[i].cannonimmunity || enemyarray[i].cannonframedata != 0) && !enemyarray[i].immunity) {
+						if (activecannon && ((enemyarray[i].xpos > 1200 - (wavexpos * 50) && enemyarray[i].xpos < 1300 - (wavexpos * 50)) || enemyarray[i].cannonimmunity) && (!enemyarray[i].cannonimmunity || enemyarray[i].cannonframedata != 0) && !enemyarray[i].immunity) {
 							
 							for (j = enemyarray[i].knockbacks - enemyarray[i].knockbackcount - 1; j >= 0 && !enemyarray[i].immunity; j--) {
 							
@@ -1028,21 +1245,15 @@ public class noplanA extends Application {
 						if (catarray[i].ID == 0) {
 							slotarray[i].setVisible(false);
 						} else {
-							unitID = catarray[i].ID;
-							unitanimation = catarray[i].animation;
-							unitbackswing = catarray[i].backswing;
-							unitframedata = catarray[i].framedata;
-							slotarray[i] = RenderCats(unitanimation, unitbackswing, unitframedata, slotarray, i, catpictures[unitID - 1], catpicturesanimation[unitID - 1], catpicturesattack[unitID - 1], catpicturesbackswing[unitID - 1]);
+							catarray[i].render(slotarray[i]);
+							slotarray[i].setVisible(true);
 						}
 						
 					}
 					
 					//positions cat images
 					for (i = 0; i < numofcats; i++) {
-						unitxpos = catarray[i].xpos;
-						unitypos = catarray[i].ypos;
-						unitID = catarray[i].ID;
-						slotarray[i] = PositionCats(slotarray, i, unitxpos, unitypos, backgroundpicture, catpictures[unitID - 1]);
+						catarray[i].position(slotarray[i], backgroundpicture.getLayoutX());
 					}
 					
 					//renders enemy images
@@ -1051,21 +1262,15 @@ public class noplanA extends Application {
 						if (enemyarray[i].ID == 0) {
 							limitarray[i].setVisible(false);
 						} else {
-							unitID = enemyarray[i].ID;
-							unitanimation = enemyarray[i].animation;
-							unitbackswing = enemyarray[i].backswing;
-							unitframedata = enemyarray[i].framedata;
-							limitarray[i] = RenderEnemies(unitanimation, unitbackswing, unitframedata, limitarray, i, enemypictures[unitID - 1], enemypicturesanimation[unitID - 1], enemypicturesattack[unitID - 1], enemypicturesbackswing[unitID - 1]);
+							enemyarray[i].render(limitarray[i]);
+							limitarray[i].setVisible(true);
 						}
 						
 					}
 					
 					//positions enemy images
 					for (i = 0; i < numofenemies; i++) {
-						unitxpos = enemyarray[i].xpos;
-						unitypos = enemyarray[i].ypos;
-						unitID = enemyarray[i].ID;
-						limitarray[i] = PositionEnemies(limitarray, i, unitxpos, unitypos, backgroundpicture, enemypictures[unitID - 1]);
+						enemyarray[i].position(limitarray[i], backgroundpicture.getLayoutX());
 					}
 					
 					//adds money to the wallet when applicable
@@ -1086,6 +1291,7 @@ public class noplanA extends Application {
 					
 						for (i = 0; i < 5; i++) {
 							rechargerects[i].setWidth(96 * (System.currentTimeMillis() - rechargearray[i].lastdeployed) / rechargearray[i].maxrecharge);
+							rechargerects[i].toFront();
 							
 							if (System.currentTimeMillis() - rechargearray[i].lastdeployed > rechargearray[i].maxrecharge) {
 								rechargerects[i].setVisible(false);
@@ -1098,6 +1304,7 @@ public class noplanA extends Application {
 						
 						for (i = 5; i < 10; i++) {
 							rechargerects[i].setWidth(96 * (System.currentTimeMillis() - rechargearray[i].lastdeployed) / rechargearray[i].maxrecharge);
+							rechargerects[i].toFront();
 							
 							if (System.currentTimeMillis() - rechargearray[i].lastdeployed > rechargearray[i].maxrecharge) {
 								rechargerects[i].setVisible(false);
@@ -1142,51 +1349,80 @@ public class noplanA extends Application {
 					catbasehealthdisplay.setText(Integer.toString(catbasehealth) + "/120000");
 					catbasehealthdisplay.setLayoutX(backgroundpicture.getLayoutX() + 1375);
 					enemybasehealthdisplay.setText(Integer.toString(enemybasehealth) + "/750000");
-					enemybasehealthdisplay.setLayoutX(backgroundpicture.getLayoutX() + 100);
+					enemybasehealthdisplay.setLayoutX(backgroundpicture.getLayoutX() + 75);
 					
 					if (catbasehealth <= 0) {
 						backgroundpicture = DefeatScreen(backgroundpicture, defeatscreen, bosspercentage, enemyarray[0].health);
 						loser = true;
-					} /*else if (enemybasehealth <= 0) {
-						winner = true;
-						leftkey = false;
-						rightkey = false;
-						tempnumofenemies = numofenemies;
+					} else if (enemybasehealth <= 0) {
 						
-						for (i = 0; i < tempnumofenemies; i++) {
-							enemyarray = removeEnemy(enemyarray, numofenemies, i);
-							numofenemies--;
-						}
-						
-						for (i = 0; i < 10; i++) {
-							slotdisplay[i].setVisible(false);
-						}
-						
-						catbasehealthdisplay.setVisible(false);
-						enemybasehealthdisplay.setVisible(false);
-						workercaticon.setVisible(false);
-						workercatlevel.setVisible(false);
-						workercatcost.setVisible(false);
-						cannonicon.setVisible(false);
-						moneydisplay.setVisible(false);
-						victorytext.setVisible(true);
-						
-						delaytimer++;
-						
-						if (delaytimer == 90 && !stagecomplete) {
-							stagecomplete = true;
-							delaytimer = 0;
-							System.out.println("got catfood and energy");
-						} else if (delaytimer == 90 && !getcatway) {
-							getcatway = 30 > random.nextInt(100);
+						if (!firsttimewinner) {
+							winner = true;
+							firsttimewinner = true;
+							leftkey = false;
+							rightkey = false;
+							tempnumofenemies = numofenemies;
 							
-							if (getcatway) {
-								System.out.println("got unit");
+							for (i = 0; i < tempnumofenemies; i++) {
+								enemyarray = removeEnemy(enemyarray, numofenemies, i);
+								numofenemies--;
+							}
+							
+							for (i = 0; i < 10; i++) {
+								slotdisplay[i].setVisible(false);
+								rechargerects[i].setVisible(false);
+							}
+							
+							catbasehealthdisplay.setVisible(false);
+							enemybasehealthdisplay.setVisible(false);
+							workercaticon.setVisible(false);
+							workercatlevel.setVisible(false);
+							workercatcost.setVisible(false);
+							cannonicon.setVisible(false);
+							moneydisplay.setVisible(false);
+							victorytext.setVisible(true);
+							
+							if (getcatway || stagecomplete) {
+								tonextbox = true;
 							}
 							
 						}
 						
-					}*/
+						delaytimer++;
+						
+						if (delaytimer == 120 && !getcatway) {
+							getcatway = 100 > random.nextInt(100);
+							
+							if (getcatway) {
+								getcatway = true;
+								catwayunlock.setVisible(true);
+								catwaytext.setVisible(true);
+								catwayunlock.toFront();
+								catwaytext.toFront();
+								
+								delaytimer = 0;
+							}
+							
+						} else if (delaytimer == 120 && !stagecomplete && tonextbox) {
+							stagecomplete = true;
+							firsttimereward.setVisible(true);
+							firstcatfoodtext.setVisible(true);
+							firstenergytext.setVisible(true);
+							firsttimereward.toFront();
+							firstcatfoodtext.toFront();
+							firstenergytext.toFront();
+							
+							delaytimer = 0;
+							tonextbox = false;
+						} else if (delaytimer == 15 && tonextbox) {
+							levelfinish.setVisible(true);
+							levelfinish.toFront();
+						}
+						
+						catwaytext.setFill(delaytimer % 10 < 5 ? purpleflash : yellowflash);
+						firstcatfoodtext.setFill(delaytimer % 10 < 5 ? purpleflash : yellowflash);
+						firstenergytext.setFill(delaytimer % 10 < 5 ? purpleflash : yellowflash);
+					}
 					
 					if (winner && backgroundpicture.getLayoutX() <= -40) {
 						backgroundpicture.setLayoutX(backgroundpicture.getLayoutX() + 40);
@@ -1210,26 +1446,11 @@ public class noplanA extends Application {
 		
 	}
 	
-	public static DeploySlots[] AssignRechargeTimes(DeploySlots[] rechargearray1) {
-		rechargearray1[0].maxrecharge = 4467;
-		rechargearray1[1].maxrecharge = 3133;
-		rechargearray1[2].maxrecharge = 5800;
-		rechargearray1[3].maxrecharge = 8667;
-		rechargearray1[4].maxrecharge = 2467;
-		rechargearray1[5].maxrecharge = 4467;
-		rechargearray1[6].maxrecharge = /*17800*/ 1;
-		rechargearray1[7].maxrecharge = 2800;
-		rechargearray1[8].maxrecharge = /*2133*/ 1;
-		rechargearray1[9].maxrecharge = 96467;
-		
-		return rechargearray1;
-	}
-	
-	public static void Instructions(Scene scene1, ImageView startbackground1, ImageView selectstart1, ImageView selecthelp1, ImageView toMenu1, Text textinstruct1[]) {
-		startbackground1.setVisible(false);
-		selectstart1.setVisible(false);
-		selecthelp1.setVisible(false);
+	private static void Instructions(ImageView whitebackground1, ImageView toMenu1, Text textinstruct1[], boolean paused1) {
+		whitebackground1.setVisible(true);
+		whitebackground1.toFront();
 		toMenu1.setVisible(true);
+		toMenu1.toFront();
 		
 		textinstruct1[0] = new Text("Use 1 - 5 to deploy units in those slots, and tab to switch to the next line of slots.");
 		textinstruct1[1] = new Text("Use A/D to move left/right and W/D to zoom in/out.");
@@ -1252,11 +1473,8 @@ public class noplanA extends Application {
 					textinstruct1[i1].setVisible(false);
 				}
 				
+				whitebackground1.setVisible(false);
 				toMenu1.setVisible(false);
-				
-				startbackground1.setVisible(true);
-				selectstart1.setVisible(true);
-				selecthelp1.setVisible(true);
 				
 				event.consume();
 				return;
@@ -1266,7 +1484,7 @@ public class noplanA extends Application {
 		
 	}
 	
-	public static void setupLevel(ImageView startbackground1, ImageView selectstart1, ImageView selecthelp1, ImageView backgroundpicture1, Text moneydisplay1, ImageView workercaticon1, Text workercatlevel1, Text workercatcost1, ImageView cannonicon1, ImageView[] slotdisplay1, Text catbasehealthdisplay1, Text enemybasehealthdisplay1) {
+	private static void setupLevel(ImageView startbackground1, ImageView selectstart1, ImageView selecthelp1, ImageView backgroundpicture1, Text moneydisplay1, ImageView workercaticon1, Text workercatlevel1, Text workercatcost1, ImageView cannonicon1, ImageView[] slotdisplay1, Text catbasehealthdisplay1, Text enemybasehealthdisplay1) {
 		startbackground1.setVisible(false);
 		selectstart1.setVisible(false);
 		selecthelp1.setVisible(false);
@@ -1287,7 +1505,7 @@ public class noplanA extends Application {
 		return;
 	}
 	
-	public static double UpgradeWallet(double truemoney1, int workercat1, Text workercatlevel1, Text workercatcost1) {
+	private static double UpgradeWallet(double truemoney1, int workercat1, Text workercatlevel1, Text workercatcost1) {
 		truemoney1 -= workercat1 * 560;
 		workercat1++;
 		workercatlevel1.setText("Level " + workercat1);
@@ -1296,7 +1514,7 @@ public class noplanA extends Application {
 		return truemoney1;
 	}
 	
-	public static ImageView moveLR(ImageView backgroundpicture1, boolean leftkey1, boolean rightkey1) {
+	private static ImageView moveLR(ImageView backgroundpicture1, boolean leftkey1, boolean rightkey1) {
 		
 		if (leftkey1 && backgroundpicture1.getLayoutX() < 0) {
 			backgroundpicture1.relocate(backgroundpicture1.getLayoutX() + 10, -380);
@@ -1309,23 +1527,32 @@ public class noplanA extends Application {
 		return backgroundpicture1;
 	}
 	
-	public static FieldEnemies[] addEnemy(FieldEnemies[] enemyarray1, int numofenemies1, int spawninstructionsID1) {
+	private static FieldEnemies[] addEnemy(FieldEnemies[] enemyarray1, int numofenemies1, int spawninstructionsID1) {
 		
 		switch (spawninstructionsID1) {
-			case 0: enemyarray1[numofenemies1] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 32000, 120, 0, 0, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true);
-			break;
-			case 1: enemyarray1[numofenemies1] = new FieldEnemies(2, 0, 363000, 363000, 2, 0, 15, 2247, 15, 0, 0, 0, 186, 186, 0, 0, 0, 0.3333, 150, 0, 3575, 15, true, true, false, false, true);
-			break;
-			case 2: enemyarray1[numofenemies1] = new FieldEnemies(3, 0, 196000, 196000, 6, 0, 10, 11134, 10, 0, 0, 0, 83, 83, 0, 0, 0, 2.1333, 150, 0, 1975, 0, true, true, false, false, true);
-			break;
-			case 3: enemyarray1[numofenemies1] = new FieldEnemies(4, 0, 500, 500, 1, 0, 15, 200, 5, 0, 0, 0, 110, 110, 0, 0, 0, 1.3333, 150, 0, 296, 15, true, true, false, false, true);
-			break;
+			case 0:
+				enemyarray1[numofenemies1] = new FieldEnemies(1, 125, 2400000, 2400000, 4, 0, 120, 32000, 120, 0, 0, 0, 355, 200, 150, 0, 0, 0.2667, 75, 0, 19750, 0, true, true, false, false, true, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
+				break;
+			case 1:
+				enemyarray1[numofenemies1] = new FieldEnemies(2, 0, 363000, 363000, 2, 0, 15, 2247, 15, 0, 0, 0, 186, 186, 0, 0, 0, 0.3333, 150, 0, 3575, 15, true, true, false, false, true, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
+				break;
+			case 2:
+				enemyarray1[numofenemies1] = new FieldEnemies(3, 0, 196000, 196000, 6, 0, 10, 11134, 10, 0, 0, 0, 83, 83, 0, 0, 0, 2.1333, 150, 0, 1975, 0, true, true, false, false, true, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
+				break;
+			case 3:
+				enemyarray1[numofenemies1] = new FieldEnemies(4, 0, 500, 500, 1, 0, 15, 200, 5, 0, 0, 0, 110, 110, 0, 0, 0, 1.3333, 150, 0, 296, 15, true, true, false, false, true, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
+				break;
 		}
+		
+		enemyarray1[numofenemies1].idleimage = new Image("Enemy_ID_" + (spawninstructionsID1 + 1) + ".png");
+		enemyarray1[numofenemies1].animationimage = new Image("Enemy_ID_" + (spawninstructionsID1 + 1) + "_Animation.png");
+		enemyarray1[numofenemies1].attackimage = new Image("Enemy_ID_" + (spawninstructionsID1 + 1) + "_Attack.png");
+		enemyarray1[numofenemies1].backswingimage = new Image("Enemy_ID_" + (spawninstructionsID1 + 1) + "_Backswing.png");
 		
 		return enemyarray1;
 	}
 	
-	public static boolean isRechargeDone(DeploySlots[] rechargearray1, boolean firstrow1, int i1) {
+	private static boolean isRechargeDone(DeploySlots[] rechargearray1, boolean firstrow1, int i1) {
 		long currenttime = System.currentTimeMillis();
 		i1--;
 		
@@ -1340,109 +1567,86 @@ public class noplanA extends Application {
 		return rechargearray1[i1].ready;
 	}
 	
-	public static FieldCats[] addCat(FieldCats[] catarray1, boolean firstrow1, int catdeployed1, int numofcats1) {
+	private static FieldCats[] addCat(FieldCats[] catarray1, boolean firstrow1, int catdeployed1, int numofcats1) {
 		
 		if (firstrow1) {
 		
 			switch (catdeployed1) {
-				case 1: catarray1[numofcats1] = new FieldCats(1, 60, 6290, 6290, 3, 0, 46, 925, 44, 64, 0, 0, 60, 0, 0, 0.6667, 1375, 0, 510, false, false, false, false, true, false, false, true);
-				break;
-				case 2: catarray1[numofcats1] = new FieldCats(2, 0, 11900, 11900, 3, 0, 32, 3400, 32, 88, 0, 0, 150, 0, 0, 0.5333, 1375, 0, 1125, true, false, false, false, true, false, false, true);
-				break;
-				case 3: catarray1[numofcats1] = new FieldCats(3, 0, 8500, 8500, 5, 0, 4, 595, 28, 32, 0, 0, 140, 0, 0, 3.1333, 1375, 0, 825, true, false, false, false, true, false, false, true);
-				break;
-				case 4: catarray1[numofcats1] = new FieldCats(4, 0, 15300, 15300, 2, 0, 24, 2176, 76, 80, 0, 0, 160, 0, 0, 0.5333, 1375, 0, 630, true, false, false, false, true, false, false, true);
-				break;
-				case 5: catarray1[numofcats1] = new FieldCats(5, 0, 17850, 17850, 1, 0, 10, 1020, 10, 0, 0, 0, 120, 0, 0, 0.5333, 1375, 0, 315, false, false, true, false, true, false, false, true);
-				break;
+				case 1:
+					catarray1[numofcats1] = new FieldCats(1, 60, 6290, 6290, 3, 0, 46, 925, 44, 64, 0, 0, 60, 0, 0, 0.6667, 1375, 0, 510, false, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 2:
+					catarray1[numofcats1] = new FieldCats(2, 40, 11900, 11900, 3, 0, 32, 3400, 32, 88, 0, 0, 35, 0, 0, 0.5333, 1375, 0, 1125, true, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 3:
+					catarray1[numofcats1] = new FieldCats(3, 110, 8500, 8500, 5, 0, 4, 595, 28, 32, 0, 0, 60, 0, 0, 3.1333, 1375, 0, 825, true, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 4:
+					catarray1[numofcats1] = new FieldCats(4, 0, 15300, 15300, 2, 0, 24, 2176, 76, 80, 0, 0, 160, 0, 0, 0.5333, 1375, 0, 630, true, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 5:
+					catarray1[numofcats1] = new FieldCats(5, 75, 17850, 17850, 1, 0, 10, 1020, 10, 0, 0, 0, 65, 0, 0, 0.5333, 1375, 0, 315, false, false, true, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
 			}
 			
+			catarray1[numofcats1].idleimage = new Image("Unit_ID_" + catdeployed1 + ".png");
+			catarray1[numofcats1].animationimage = new Image("Unit_ID_" + catdeployed1 + "_Animation.png");
+			catarray1[numofcats1].attackimage = new Image("Unit_ID_" + catdeployed1 + "_Attack.png");
+			catarray1[numofcats1].backswingimage = new Image("Unit_ID_" + catdeployed1 + "_Backswing.png");
 		} else {
 			
 			switch (catdeployed1) {
-				case 1: catarray1[numofcats1] = new FieldCats(6, 0, 9435, 9435, 4, 0, 24, 3400, 71, 64, 0, 0, 200, 0, 0, 1.4, 1375, 0, 525, false, true, false, false, true, false, false, true);
-				break;
-				case 2: catarray1[numofcats1] = new FieldCats(7, 28, 15300, 15300, 1, 0, 1, /*25500*/ 1, /*400*/ 1, 0, 0, 0, 14, 0, 0, /*5*/ 500, 1375, 0, 750, false, false, false, true, true, false, false, true);
-				break;
-				case 3: catarray1[numofcats1] = new FieldCats(8, 0, 26100, 26100, 5, 0, 12, 682, 8, 0, 0, 0, 140, 0, 0, 4.4, 1375, 0, 750, true, false, false, false, true, false, false, true);
-				break;
-				case 4: catarray1[numofcats1] = new FieldCats(9, 95, 15660, 15660, 4, 0, 40, 10497, 42, 80, 0, 0, 85, 0, 0, 0.6667, 1375, 0, /* 975 */ 0, true, false, false, false, true, false, false, true);
-				break;
-				case 5: catarray1[numofcats1] = new FieldCats(10, 0, 25500, 25500, 6, 0, 0, 85000, 0, 0, 0, 0, 200, 0, 0, 4, 1375, 0, 4500, true, false, false, false, true, false, false, true);
-				break;
+				case 1:
+					catarray1[numofcats1] = new FieldCats(6, 0, 9435, 9435, 4, 0, 24, 3400, 71, 64, 0, 0, 200, 0, 0, 1.4, 1375, 0, 525, false, true, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 2:
+					catarray1[numofcats1] = new FieldCats(7, 28, 15300, 15300, 1, 0, 1, 25500, /*400*/ 1, 0, 0, 0, 14, 0, 0, 5, 1375, 0, 750, false, false, false, true, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 3:
+					catarray1[numofcats1] = new FieldCats(8, 0, 26100, 26100, 5, 0, 12, 682, 8, 0, 0, 0, 140, 0, 0, 4.4, 1375, 0, 750, true, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 4:
+					catarray1[numofcats1] = new FieldCats(9, 95, 15660, 15660, 4, 0, 40, 10497, 42, 80, 0, 0, 85, 0, 0, 0.6667, 1375, 0, 975, true, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
+				case 5:
+					catarray1[numofcats1] = new FieldCats(10, 0, 25500, 25500, 6, 0, 0, 85000, 0, 0, 0, 0, 200, 0, 0, 4, 1375, 0, 4500, true, false, false, false, true, false, false, true, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
+					break;
 			}
 			
+			catarray1[numofcats1].idleimage = new Image("Unit_ID_" + (catdeployed1 + 5) + ".png");
+			catarray1[numofcats1].animationimage = new Image("Unit_ID_" + (catdeployed1 + 5) + "_Animation.png");
+			catarray1[numofcats1].attackimage = new Image("Unit_ID_" + (catdeployed1 + 5) + "_Attack.png");
+			catarray1[numofcats1].backswingimage = new Image("Unit_ID_" + (catdeployed1 + 5) + "_Backswing.png");
 		}
 		
 		return catarray1;
 	}
 	
-	public static FieldCats[] removeCat(FieldCats[] catarray1, int numofcats1, int i1) {
+	private static FieldCats[] removeCat(FieldCats[] catarray1, int numofcats1, int i1) {
 		
 		for (int j1 = i1; j1 < numofcats1 - 1; j1++) {
 			catarray1[j1] = catarray1[j1 + 1];
 		}
 		
-		catarray1[numofcats1 - 1] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false);
+		catarray1[numofcats1 - 1] = new FieldCats(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, false, false, new Image("Unit_ID_0.png"), new Image("Unit_ID_0_Animation.png"), new Image("Unit_ID_0_Attack.png"), new Image("Unit_ID_0_Backswing.png"));
 		return catarray1;
 	}
 	
-	public static FieldEnemies[] removeEnemy(FieldEnemies[] enemyarray1, int numofenemies1, int i1) {
+	private static FieldEnemies[] removeEnemy(FieldEnemies[] enemyarray1, int numofenemies1, int i1) {
 		
 		for (int j1 = i1; j1 < numofenemies1 - 1; j1++) {
 			enemyarray1[j1] = enemyarray1[j1 + 1];
 		}
 		
-		enemyarray1[numofenemies1 - 1] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false);
+		enemyarray1[numofenemies1 - 1] = new FieldEnemies(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, new Image("Enemy_ID_0.png"), new Image("Enemy_ID_0_Animation.png"), new Image("Enemy_ID_0_Attack.png"), new Image("Enemy_ID_0_Backswing.png"));
 		return enemyarray1;
 	}
 	
-	public static boolean StopMoving(double selfxpos, double selfbaseline, double selfrange, double otherxpos, double otherbaseline, boolean otherimmunity, boolean othercannonimmunity) {
-		boolean allowmove1 = true;
-		
-		if (selfxpos + selfbaseline - selfrange < otherxpos + otherbaseline && selfxpos + selfbaseline > otherxpos + otherbaseline && allowmove1 &&
-			!(otherimmunity || othercannonimmunity)) {
-			allowmove1 = false;
-		}
-		
-		return allowmove1;
-	}
-	
-	public static ImageView RenderCats(int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] slotarray1, int i1, Image unitpictures1, Image unitpicturesanimation1, Image unitpicturesattack1, Image unitpicturesbackswing1) {
-		slotarray1[i1].setImage(unitframedata1 > unitanimation1 + (0.25 * unitbackswing1) ? unitpicturesbackswing1 :
-								unitframedata1 >= unitanimation1 ? unitpicturesattack1 :
-								unitframedata1 != 0 ? unitpicturesanimation1 :
-								unitpictures1);
-		slotarray1[i1].setVisible(true);
-		
-		return slotarray1[i1];
-	}
-	
-	public static ImageView PositionCats(ImageView[] slotarray1, int i1, double unitxpos1, double unitypos1, ImageView backgroundpicture1, Image unitpictures1) {
-		slotarray1[i1].relocate(unitxpos1 + backgroundpicture1.getLayoutX(), 275 - unitypos1 - unitpictures1.getHeight());
-		return slotarray1[i1];
-	}
-	
-	public static ImageView RenderEnemies(int unitanimation1, int unitbackswing1, int unitframedata1, ImageView[] limitarray1, int i1, Image unitpictures1, Image unitpicturesanimation1, Image unitpicturesattack1, Image unitpicturesbackswing1) {
-		limitarray1[i1].setImage(unitframedata1 > unitanimation1 + (0.25 * unitbackswing1) ? unitpicturesbackswing1 :
-								 unitframedata1 >= unitanimation1 ? unitpicturesattack1 :
-								 unitframedata1 != 0 ? unitpicturesanimation1 :
-								 unitpictures1);
-		limitarray1[i1].setVisible(true);
-		
-		return limitarray1[i1];
-	}
-	
-	public static ImageView PositionEnemies(ImageView[] limitarray1, int i1, double unitxpos1, double unitypos1, ImageView backgroundpicture1, Image  unitpictures1) {
-		limitarray1[i1].relocate(unitxpos1 + backgroundpicture1.getLayoutX(), 275 - unitypos1 - unitpictures1.getHeight());
-		return limitarray1[i1];
-	}
-	
-	public static double IncomeGeneration(double truemoney1, int maxmoney1, int workercat1) {
+	private static double IncomeGeneration(double truemoney1, int maxmoney1, int workercat1) {
 		return (truemoney1 = truemoney1 + ((workercat1 * 9.44286) + 175.007) / 6 <= maxmoney1 ? truemoney1 + ((workercat1 * 9.44286) + 175.007) / 6 : maxmoney1);
 	}
 	
-	public static boolean ChangeWorkerCatIcon(boolean canaffordupgrade1, double truemoney1, int workercat1, ImageView workercaticon1, Image workercatactive1, Image workercatidle1, Text workercatlevel1, Color active1, Color idle1) {
+	private static boolean ChangeWorkerCatIcon(boolean canaffordupgrade1, double truemoney1, int workercat1, ImageView workercaticon1, Image workercatactive1, Image workercatidle1, Text workercatlevel1, Color active1, Color idle1) {
 		
 		if (!canaffordupgrade1 && truemoney1 > workercat1 * 560) {
 			canaffordupgrade1 = true;
@@ -1457,7 +1661,7 @@ public class noplanA extends Application {
 		return canaffordupgrade1;
 	}
 	
-	public static ImageView DefeatScreen(ImageView backgroundpicture1, Image defeatscreen1, Text bosspercentage1, int clionelhealth1) {
+	private static ImageView DefeatScreen(ImageView backgroundpicture1, Image defeatscreen1, Text bosspercentage1, int clionelhealth1) {
 		backgroundpicture1.setImage(defeatscreen1);
 		backgroundpicture1.relocate(0, 0);
 		backgroundpicture1.toFront();
